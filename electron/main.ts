@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, globalShortcut, dialog, shell, ipcMain, Notification } from 'electron'
+import { app, BrowserWindow, Tray, Menu, nativeImage, globalShortcut, dialog, shell, ipcMain, Notification, desktopCapturer } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
 
@@ -6,6 +6,10 @@ import fs from 'node:fs'
 app.commandLine.appendSwitch('enable-features', 'WebRTCPipeWireCapturer')
 app.commandLine.appendSwitch('enable-usermedia-screen-capturing')
 app.commandLine.appendSwitch('enable-experimental-web-platform-features')
+app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled')
+
+const chromeLikeUA =
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 let tray: Tray | null = null
 
@@ -24,13 +28,26 @@ function createMainWindow(partition = 'persist:default') {
   })
 
   // Load WhatsApp Web with a Chrome-like user agent for better compatibility (calls / media)
-  const chromeLikeUA =
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  win.webContents.setUserAgent(chromeLikeUA)
+  win.webContents.session.setUserAgent(chromeLikeUA)
   win.loadURL('https://web.whatsapp.com', { userAgent: chromeLikeUA })
 
+  // Native display-capture handler for WhatsApp screen sharing (and call flows that probe capture support)
+  const session = win.webContents.session
+  if (typeof session.setDisplayMediaRequestHandler === 'function') {
+    session.setDisplayMediaRequestHandler(async (request, callback) => {
+      try {
+        const source = await desktopCaptureForDisplayShare()
+        callback({ video: source, audio: 'loopback' as any })
+      } catch (err) {
+        console.warn('Display media request failed', err)
+        callback(null)
+      }
+    })
+  }
+
   // Handle permission requests for camera / microphone / notifications / display-capture
-  const ses = win.webContents.session
-  ses.setPermissionRequestHandler((_webContents, permission: string, callback: (grant: boolean) => void) => {
+  session.setPermissionRequestHandler((_webContents, permission: string, callback: (grant: boolean) => void) => {
     // Allow common permissions used by WhatsApp Web
     const allow = ['media', 'microphone', 'camera', 'display-capture', 'notifications', 'fullscreen']
     if (allow.includes(permission)) {
@@ -42,12 +59,33 @@ function createMainWindow(partition = 'persist:default') {
 
   // Optionally handle new-window / external links to open in default browser
   win.webContents.setWindowOpenHandler(({ url }) => {
-    // open external links in user's default browser
-    shell.openExternal(url)
+    try {
+      const hostname = new URL(url).hostname
+      const isWhatsAppHost = /(^|\.)whatsapp\.com$/i.test(hostname) || /(^|\.)whatsapp\.net$/i.test(hostname) || /(^|\.)fbcdn\.net$/i.test(hostname)
+
+      if (isWhatsAppHost) {
+        return { action: 'allow' }
+      }
+
+      shell.openExternal(url)
+    } catch {
+      // ignore malformed URLs
+    }
     return { action: 'deny' }
   })
 
   return win
+}
+
+async function desktopCaptureForDisplayShare() {
+  const sources = await desktopCapturer.getSources({ types: ['screen', 'window'], thumbnailSize: { width: 1, height: 1 } })
+
+  const preferred = sources.find((s) => /screen|entire|display/i.test(s.name)) || sources[0]
+  if (!preferred) {
+    throw new Error('No desktop sources available')
+  }
+
+  return preferred
 }
 
 function createTray(win: BrowserWindow) {

@@ -1,4 +1,4 @@
-import { app, globalShortcut, ipcMain, Notification, shell, BrowserWindow, dialog, nativeImage, Tray, Menu } from "electron";
+import { app, globalShortcut, ipcMain, Notification, shell, BrowserWindow, dialog, nativeImage, Tray, Menu, desktopCapturer } from "electron";
 import path from "node:path";
 import fs from "node:fs";
 import __cjs_mod__ from "node:module";
@@ -8,6 +8,8 @@ const require2 = __cjs_mod__.createRequire(import.meta.url);
 app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
 app.commandLine.appendSwitch("enable-usermedia-screen-capturing");
 app.commandLine.appendSwitch("enable-experimental-web-platform-features");
+app.commandLine.appendSwitch("disable-blink-features", "AutomationControlled");
+const chromeLikeUA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 let tray = null;
 function createMainWindow(partition = "persist:default") {
   const win = new BrowserWindow({
@@ -22,10 +24,22 @@ function createMainWindow(partition = "persist:default") {
       partition
     }
   });
-  const chromeLikeUA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  win.webContents.setUserAgent(chromeLikeUA);
+  win.webContents.session.setUserAgent(chromeLikeUA);
   win.loadURL("https://web.whatsapp.com", { userAgent: chromeLikeUA });
-  const ses = win.webContents.session;
-  ses.setPermissionRequestHandler((_webContents, permission, callback) => {
+  const session = win.webContents.session;
+  if (typeof session.setDisplayMediaRequestHandler === "function") {
+    session.setDisplayMediaRequestHandler(async (request, callback) => {
+      try {
+        const source = await desktopCaptureForDisplayShare();
+        callback({ video: source, audio: "loopback" });
+      } catch (err) {
+        console.warn("Display media request failed", err);
+        callback(null);
+      }
+    });
+  }
+  session.setPermissionRequestHandler((_webContents, permission, callback) => {
     const allow = ["media", "microphone", "camera", "display-capture", "notifications", "fullscreen"];
     if (allow.includes(permission)) {
       callback(true);
@@ -34,10 +48,26 @@ function createMainWindow(partition = "persist:default") {
     }
   });
   win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    try {
+      const hostname = new URL(url).hostname;
+      const isWhatsAppHost = /(^|\.)whatsapp\.com$/i.test(hostname) || /(^|\.)whatsapp\.net$/i.test(hostname) || /(^|\.)fbcdn\.net$/i.test(hostname);
+      if (isWhatsAppHost) {
+        return { action: "allow" };
+      }
+      shell.openExternal(url);
+    } catch {
+    }
     return { action: "deny" };
   });
   return win;
+}
+async function desktopCaptureForDisplayShare() {
+  const sources = await desktopCapturer.getSources({ types: ["screen", "window"], thumbnailSize: { width: 1, height: 1 } });
+  const preferred = sources.find((s) => /screen|entire|display/i.test(s.name)) || sources[0];
+  if (!preferred) {
+    throw new Error("No desktop sources available");
+  }
+  return preferred;
 }
 function createTray(win) {
   try {
