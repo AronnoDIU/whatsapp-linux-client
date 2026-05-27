@@ -16,6 +16,11 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     const [channel, ...omit] = args;
     return ipcRenderer.invoke(channel, ...omit);
   }
-  // You can expose other APTs you need here.
-  // ...
+});
+contextBridge.exposeInMainWorld("whatsappNative", {
+  showNotification: (title, body) => ipcRenderer.send("native-notification", { title, body }),
+  openExternal: (url) => ipcRenderer.invoke("open-external", url),
+  createNewAccountWindow: () => ipcRenderer.send("create-new-account"),
+  pickFiles: (options) => ipcRenderer.invoke("dialog:openFiles", options),
+  getAppVersion: () => ipcRenderer.invoke("get-app-version")
 });

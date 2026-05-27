@@ -1,6 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
 
-// --------- Expose some API to the Renderer process ---------
+// --------- Expose a small, safe API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args
@@ -17,8 +17,14 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
-  },
+  }
+})
 
-  // You can expose other APTs you need here.
-  // ...
+// Expose higher-level helpers under window.whatsappNative
+contextBridge.exposeInMainWorld('whatsappNative', {
+  showNotification: (title: string, body?: string) => ipcRenderer.send('native-notification', { title, body }),
+  openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
+  createNewAccountWindow: () => ipcRenderer.send('create-new-account'),
+  pickFiles: (options?: Electron.OpenDialogOptions) => ipcRenderer.invoke('dialog:openFiles', options),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version')
 })
