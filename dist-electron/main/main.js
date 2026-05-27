@@ -29,13 +29,13 @@ function createMainWindow(partition = "persist:default") {
   win.loadURL("https://web.whatsapp.com", { userAgent: chromeLikeUA });
   const session = win.webContents.session;
   if (typeof session.setDisplayMediaRequestHandler === "function") {
-    session.setDisplayMediaRequestHandler(async (request, callback) => {
+    session.setDisplayMediaRequestHandler(async (_request, callback) => {
       try {
         const source = await desktopCaptureForDisplayShare();
-        callback({ video: source, audio: "loopback" });
+        callback({ video: source });
       } catch (err) {
         console.warn("Display media request failed", err);
-        callback(null);
+        callback({});
       }
     });
   }
