@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { app, BrowserWindow, Tray, Menu, nativeImage, globalShortcut, dialog, shell, ipcMain, Notification, desktopCapturer } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 // Improve WebRTC / screen capture support on Linux (PipeWire)
 app.commandLine.appendSwitch('enable-features', 'WebRTCPipeWireCapturer')
@@ -30,7 +32,9 @@ function createMainWindow(partition = 'persist:default') {
   // Load WhatsApp Web with a Chrome-like user agent for better compatibility (calls / media)
   win.webContents.setUserAgent(chromeLikeUA)
   win.webContents.session.setUserAgent(chromeLikeUA)
-  win.loadURL('https://web.whatsapp.com', { userAgent: chromeLikeUA })
+  win.loadURL('https://web.whatsapp.com', { userAgent: chromeLikeUA }).catch((err) => {
+    console.error('Failed to load WhatsApp Web:', err)
+  })
 
   // Native display-capture handler for WhatsApp screen sharing (and call flows that probe capture support)
   const session = win.webContents.session
@@ -67,7 +71,7 @@ function createMainWindow(partition = 'persist:default') {
         return { action: 'allow' }
       }
 
-      shell.openExternal(url)
+      void shell.openExternal(url)
     } catch {
       // ignore malformed URLs
     }
@@ -111,7 +115,7 @@ function createTray(win: BrowserWindow) {
     }
 
     if (!tray) {
-      // No icon loaded or all attempts failed — skip creating the tray to avoid crashing
+      // No icon loaded, or all attempts failed — skip creating the tray to avoid crashing
       console.warn('No valid tray icon found, skipping tray creation')
       return
     }
@@ -210,6 +214,6 @@ app.on('will-quit', () => {
   try {
     globalShortcut.unregisterAll()
   } catch (e) {
-    // ignore
+    console.warn('Failed to unregister shortcuts', e)
   }
 })

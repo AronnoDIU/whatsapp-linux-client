@@ -40,7 +40,7 @@ contextBridge.exposeInMainWorld('whatsappNative', {
     const screenSource = sources.find(s => /screen|entire/i.test(s.name)) || sources[0]
     const sourceId = screenSource.id
 
-    // Build constraints compatible with Electron/Chromium. Respect common requested values if provided.
+    // Build constraints compatible with Electron/Chromium. Respect commonly requested values if provided.
     const requested = constraints as unknown as { video?: { width?: number; height?: number; frameRate?: number } }
     const maxWidth = requested?.video?.width ?? 1920
     const maxHeight = requested?.video?.height ?? 1080
@@ -56,7 +56,7 @@ contextBridge.exposeInMainWorld('whatsappNative', {
       }
     } as unknown as MediaTrackConstraints
 
-    // Use navigator.mediaDevices.getUserMedia to obtain the stream for the chosen source
+    // Use navigator.mediaDevices.getUserMedia to get the stream for the chosen source
     // Note: audio capture for system audio is platform-dependent; we request video only here
     return await navigator.mediaDevices.getUserMedia({ audio: false, video: videoConstraints })
   }

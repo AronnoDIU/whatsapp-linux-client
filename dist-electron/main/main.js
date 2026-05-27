@@ -26,7 +26,9 @@ function createMainWindow(partition = "persist:default") {
   });
   win.webContents.setUserAgent(chromeLikeUA);
   win.webContents.session.setUserAgent(chromeLikeUA);
-  win.loadURL("https://web.whatsapp.com", { userAgent: chromeLikeUA });
+  win.loadURL("https://web.whatsapp.com", { userAgent: chromeLikeUA }).catch((err) => {
+    console.error("Failed to load WhatsApp Web:", err);
+  });
   const session = win.webContents.session;
   if (typeof session.setDisplayMediaRequestHandler === "function") {
     session.setDisplayMediaRequestHandler(async (_request, callback) => {
@@ -54,7 +56,7 @@ function createMainWindow(partition = "persist:default") {
       if (isWhatsAppHost) {
         return { action: "allow" };
       }
-      shell.openExternal(url);
+      void shell.openExternal(url);
     } catch {
     }
     return { action: "deny" };
@@ -162,5 +164,6 @@ app.on("will-quit", () => {
   try {
     globalShortcut.unregisterAll();
   } catch (e) {
+    console.warn("Failed to unregister shortcuts", e);
   }
 });
