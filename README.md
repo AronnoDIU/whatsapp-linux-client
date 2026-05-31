@@ -24,12 +24,15 @@ The app loads WhatsApp Web with a Chrome-like user agent and adds a set of compa
   - open a new window for a separate account
   - quit the application
 - **Global shortcut**: `Ctrl + Alt + W` toggles the window visibility
+- **Zoom shortcuts**: `Ctrl + =`, `Ctrl + -`, and `Ctrl + 0`
 - **Native notifications** from the Electron main process
 - **External links** open in the system browser
 - **File picker** support via native dialogs
 - **Multiple account windows** using separate Electron sessions / partitions
+- **Saved window state** so size, position, fullscreen, and zoom are restored on launch
 - **Display-capture fallback** for screen sharing on Linux / PipeWire environments
 - **Permission handling** for camera, microphone, notifications, and display capture
+- **Bengali typography tuning** with bundled Noto Bengali fonts for cleaner Bangla rendering
 
 ## Prerequisites
 
@@ -154,6 +157,16 @@ sudo snap install --dangerous release/<version>/*.snap
 snapcraft upload release/<version>/*.snap --release=stable
 ```
 
+### Smoother desktop behavior
+
+The app now includes a few quality-of-life improvements:
+
+- restored window size / position / fullscreen state between launches
+- zoom controls from the tray menu and keyboard shortcuts
+- `Esc` exits fullscreen
+- reload / hard-reload actions in the tray menu
+- Bengali font fallback injection for WhatsApp Web content
+
 ### CI/CD: automatic Snap build and publish
 
 Workflows included:
@@ -273,6 +286,11 @@ Screen sharing on Linux can depend on your desktop session:
 The app includes a native fallback for `getDisplayMedia` to improve compatibility with WhatsApp Web calls and screen sharing.
 
 ## Troubleshooting
+
+### Bangla text looks poor
+
+- The app now bundles `fonts-noto-core` in the snap and injects a Bengali-friendly font stack into WhatsApp Web.
+- If a specific Bengali font still looks wrong on your system, make sure the installed snap has refreshed to the newest revision.
 
 ### The app opens, but screen sharing does not work
 

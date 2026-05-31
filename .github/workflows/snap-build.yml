@@ -28,6 +28,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
+          if ! command -v multipass >/dev/null 2>&1; then
+            sudo apt-get install -y multipass || sudo snap install multipass
+          fi
 
       - name: Install dependencies
         run: npm ci
