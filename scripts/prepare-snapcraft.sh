@@ -30,7 +30,8 @@ fi
 REPO_NAME="$(basename "$ROOT_DIR")"
 if [[ ! -e "$DEST_DIR/$REPO_NAME" ]]; then
   mkdir -p "$DEST_DIR/$REPO_NAME"
-  cp -a "$DEST_DIR/." "$DEST_DIR/$REPO_NAME/"
+  # copy from the original unpacked source (not from DEST_DIR which may already contain REPO_NAME)
+  cp -a "$SRC_DIR/." "$DEST_DIR/$REPO_NAME/"
 fi
 echo "Prepared snapcraft source directory at: $DEST_DIR"
 
