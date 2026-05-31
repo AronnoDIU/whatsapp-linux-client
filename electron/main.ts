@@ -9,6 +9,7 @@ app.commandLine.appendSwitch('enable-features', 'WebRTCPipeWireCapturer')
 app.commandLine.appendSwitch('enable-usermedia-screen-capturing')
 app.commandLine.appendSwitch('enable-experimental-web-platform-features')
 app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled')
+app.commandLine.appendSwitch('disable-dev-shm-usage')
 
 const chromeLikeUA =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
