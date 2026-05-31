@@ -18,8 +18,10 @@ source-code: https://github.com/aronno/whatsapp-linux-client
 issues: https://github.com/aronno/whatsapp-linux-client/issues
 contact: https://github.com/aronno/whatsapp-linux-client/issues
 
-architectures:
-  - build-on: amd64
+platforms:
+  amd64:
+    build-on: amd64
+    build-for: amd64
 
 apps:
   whats-tux:
