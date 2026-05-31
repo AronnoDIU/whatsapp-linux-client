@@ -34,7 +34,6 @@ apps:
       - desktop
       - desktop-legacy
       - gsettings
-      - graphics-core22
       - home
       - network
       - network-bind
@@ -67,5 +66,6 @@ parts:
       - libxi6
       - libxcursor1
       - libxkbcommon0
-
-
+      # Graphics and GPU support (packages verified in core22)
+      - libgbm1
+      - libdrm2
