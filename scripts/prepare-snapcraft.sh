@@ -19,6 +19,20 @@ rm -rf "$DEST_DIR"
 mkdir -p "$DEST_DIR"
 cp -a "$SRC_DIR/." "$DEST_DIR/"
 
+# Remove host system libraries that may have been bundled into the unpacked app.
+# These libraries are linked against the host's glibc and can cause symbol
+# version mismatches (e.g. GLIBC_2.38) when the snap runs on systems with an
+# older glibc. Snaps should rely on the base snap for core system libraries.
+# Delete common system library folders if they were accidentally copied.
+if [[ -d "$DEST_DIR/usr/lib/x86_64-linux-gnu" ]]; then
+  echo "Removing bundled host system libs from $DEST_DIR/usr/lib/x86_64-linux-gnu"
+  rm -rf "$DEST_DIR/usr/lib/x86_64-linux-gnu"
+fi
+if [[ -d "$DEST_DIR/lib/x86_64-linux-gnu" ]]; then
+  echo "Removing bundled host system libs from $DEST_DIR/lib/x86_64-linux-gnu"
+  rm -rf "$DEST_DIR/lib/x86_64-linux-gnu"
+fi
+
 if [[ ! -f "$ROOT_DIR/snap/gui/icon.png" ]]; then
   echo "Error: snap icon not found at 'snap/gui/icon.png'. Run: npm run icons:generate" >&2
   exit 1
