@@ -45,6 +45,19 @@ mkdir -p "$DEST_DIR/snap/gui"
 cp -a "$ROOT_DIR/snap/gui/whats-tux.desktop" "$DEST_DIR/snap/gui/whats-tux.desktop"
 cp -a "$ROOT_DIR/snap/gui/icon.png" "$DEST_DIR/snap/gui/icon.png"
 
+# Replace the direct Electron executable with a tiny wrapper that forces
+# `--no-sandbox`. In snaps, the SUID sandbox helper is commonly not usable,
+# and Electron aborts if it finds `chrome-sandbox` but cannot use it.
+if [[ -f "$DEST_DIR/whats-tux" && ! -f "$DEST_DIR/whats-tux-bin" ]]; then
+  mv "$DEST_DIR/whats-tux" "$DEST_DIR/whats-tux-bin"
+  cat > "$DEST_DIR/whats-tux" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec "$(dirname "$0")/whats-tux-bin" --no-sandbox "$@"
+EOF
+  chmod 0755 "$DEST_DIR/whats-tux"
+fi
+
 # Some snap templates expect the application to be inside a directory named after the
 # repository (e.g. "whatsapp-linux-client"). Ensure that name exists alongside the
 # unpacked contents so `snapcraft pack` can find the expected path.
