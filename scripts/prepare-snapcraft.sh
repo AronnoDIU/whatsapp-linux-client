@@ -14,8 +14,10 @@ if [[ ! -d "$SRC_DIR" ]]; then
 fi
 
 rm -rf "$DEST_DIR"
-mkdir -p "$(dirname "$DEST_DIR")"
-cp -a "$SRC_DIR" "$DEST_DIR"
+# ensure destination directory exists, then copy the *contents* of the unpacked folder
+# (previously we copied the folder itself which produced an extra nested `linux-unpacked/linux-unpacked`)
+mkdir -p "$DEST_DIR"
+cp -a "$SRC_DIR/." "$DEST_DIR/"
 
 if [[ ! -f "$ROOT_DIR/snap/gui/icon.png" ]]; then
   echo "Error: snap icon not found at 'snap/gui/icon.png'. Run: npm run icons:generate" >&2
