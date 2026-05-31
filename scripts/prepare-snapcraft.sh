@@ -56,39 +56,17 @@ if [[ ! -e "$DEST_DIR/$REPO_NAME" ]]; then
 fi
 echo "Prepared snapcraft source directory at: $DEST_DIR"
 
-# Create compatibility symlink for OSS if a variant of liboss is present but
-# the runtime expects a different filename (some bundled binaries reference
-# historical/odd names like 'libOSSlib.so'). This is defensive and safe: if no
-# liboss library is present nothing happens.
-while IFS= read -r libfile; do
-  libdir=$(dirname "$libfile")
-  # normalized target name the runtime reported
-  target_name="$libdir/libOSSlib.so"
-  if [[ ! -e "$target_name" ]]; then
-    echo "Creating OSS compatibility symlink: $target_name -> $(basename "$libfile")"
-    ln -s "$(basename "$libfile")" "$target_name" || true
-  fi
-
-done < <(find "$DEST_DIR" -type f -iname 'liboss*.so*' -print)
-
-# Also create common global symlinks in /usr/lib and /usr/lib/<triplet> so that
-# libraries looked up by absolute names or via different loader paths are
-# satisfied. This covers cases where consumers reference /usr/lib/libOSSlib.so
-# instead of the soname under arch-specific directories.
-for libfile in $(find "$DEST_DIR" -type f -iname 'liboss*.so*' -print); do
-  libname=$(basename "$libfile")
-  # where to place additional symlinks
-  for d in "$DEST_DIR/usr/lib" "$DEST_DIR/usr/lib/$(basename "$(dirname "$libfile")")"; do
-    if [[ -d "$d" ]]; then
-      if [[ ! -e "$d/libOSSlib.so" ]]; then
-        echo "Creating additional OSS compatibility symlink: $d/libOSSlib.so -> $libname"
-        ln -s "$libname" "$d/libOSSlib.so" || true
-      fi
-      if [[ ! -e "$d/libOSSlib.so.1" ]]; then
-        echo "Creating additional OSS compatibility symlink: $d/libOSSlib.so.1 -> $libname"
-        ln -s "$libname" "$d/libOSSlib.so.1" || true
-      fi
-    fi
-  done
-done
+# Create an explicit OSS compatibility symlink in the staged filesystem.
+# The package we stage provides `liboss4-salsa.so.2`, but the runtime error
+# requests `libOSSlib.so`. A direct alias keeps the linker satisfied without
+# depending on whatever path the package happens to unpack into.
+mkdir -p "$DEST_DIR/usr/lib/x86_64-linux-gnu"
+if [[ ! -e "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so" ]]; then
+  echo "Creating OSS compatibility symlink: $DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so -> liboss4-salsa.so.2"
+  ln -s "liboss4-salsa.so.2" "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so"
+fi
+if [[ ! -e "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so.1" ]]; then
+  echo "Creating OSS compatibility symlink: $DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so.1 -> liboss4-salsa.so.2"
+  ln -s "liboss4-salsa.so.2" "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so.1"
+fi
 
