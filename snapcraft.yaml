@@ -72,3 +72,6 @@ parts:
       # Graphics and GPU support (packages verified in core24)
       - libgbm1
       - libdrm2
+      # OSS compatibility libraries (legacy audio) - provide OSS symbols if needed
+      - liboss4
+      - liboss4-salsa2

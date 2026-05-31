@@ -56,3 +56,17 @@ if [[ ! -e "$DEST_DIR/$REPO_NAME" ]]; then
 fi
 echo "Prepared snapcraft source directory at: $DEST_DIR"
 
+# Create compatibility symlink for OSS if a variant of liboss is present but
+# the runtime expects a different filename (some bundled binaries reference
+# historical/odd names like 'libOSSlib.so'). This is defensive and safe: if no
+# liboss library is present nothing happens.
+while IFS= read -r libfile; do
+  libdir=$(dirname "$libfile")
+  # normalized target name the runtime reported
+  target_name="$libdir/libOSSlib.so"
+  if [[ ! -e "$target_name" ]]; then
+    echo "Creating OSS compatibility symlink: $target_name -> $(basename "$libfile")"
+    ln -s "$(basename "$libfile")" "$target_name" || true
+  fi
+done < <(find "$DEST_DIR" -type f -iname 'liboss*.so*' -print)
+
