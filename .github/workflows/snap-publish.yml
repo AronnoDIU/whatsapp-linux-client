@@ -52,6 +52,12 @@ jobs:
           fi
           echo "/snap/bin" >> "$GITHUB_PATH"
 
+      - name: Pre-install core22 snap
+        run: |
+          sudo snap install core22 --classic || true
+          # Give snap daemon time to settle
+          sleep 2
+
       - name: Install dependencies
         run: npm ci
 
