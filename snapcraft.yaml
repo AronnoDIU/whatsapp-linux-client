@@ -55,6 +55,7 @@ parts:
       - libappindicator3-1
       - libxkbfile1
       - libpulse0
+      - libasound2
       - libxcomposite1
       - libxdamage1
       - libxfixes3
