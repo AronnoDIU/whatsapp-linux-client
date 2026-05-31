@@ -66,4 +66,8 @@ parts:
       - libxi6
       - libxcursor1
       - libxkbcommon0
+      # Graphics and GPU support
+      - libgbm1
+      - libgl1-mesa-glx
+      - libdrm2
 
