@@ -38,6 +38,13 @@ if [[ ! -f "$ROOT_DIR/snap/gui/icon.png" ]]; then
   exit 1
 fi
 
+# Snapcraft expects the desktop entry to exist inside the prepared source tree.
+# Copy the desktop file and icon into the staged snap/gui directory so core24
+# packaging can resolve snap/gui/whats-tux.desktop during validation.
+mkdir -p "$DEST_DIR/snap/gui"
+cp -a "$ROOT_DIR/snap/gui/whats-tux.desktop" "$DEST_DIR/snap/gui/whats-tux.desktop"
+cp -a "$ROOT_DIR/snap/gui/icon.png" "$DEST_DIR/snap/gui/icon.png"
+
 # Some snap templates expect the application to be inside a directory named after the
 # repository (e.g. "whatsapp-linux-client"). Ensure that name exists alongside the
 # unpacked contents so `snapcraft pack` can find the expected path.
