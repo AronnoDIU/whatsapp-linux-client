@@ -10,6 +10,7 @@ description: |
 
 grade: stable
 confinement: strict
+license: MIT
 compression: lzo
 icon: snap/gui/icon.png
 website: https://github.com/aronno/whatsapp-linux-client

@@ -70,8 +70,7 @@
       "opengl",
       "audio-playback",
       "audio-record",
-      "camera",
-      "screen-inhibit"
+      "camera"
     ]
   }
 }
