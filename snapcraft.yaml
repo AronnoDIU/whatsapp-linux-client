@@ -57,7 +57,7 @@ parts:
       - libappindicator3-1
       - libxkbfile1
       - libpulse0
-      - libasound2
+      - libasound2t64
       - libxcomposite1
       - libxdamage1
       - libxfixes3
@@ -72,7 +72,5 @@ parts:
       # Graphics and GPU support (packages verified in core24)
       - libgbm1
       - libdrm2
-      # OSS compatibility libraries (legacy audio) - provide OSS symbols if needed
-      # use distro package names available in the core24 repos
-      - liboss4-salsa-asound2
+      # OSS compatibility library (legacy audio) - provides libOSSlib.so
       - liboss4-salsa2

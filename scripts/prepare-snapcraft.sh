@@ -57,16 +57,13 @@ fi
 echo "Prepared snapcraft source directory at: $DEST_DIR"
 
 # Create an explicit OSS compatibility symlink in the staged filesystem.
-# The package we stage provides `liboss4-salsa.so.2`, but the runtime error
-# requests `libOSSlib.so`. A direct alias keeps the linker satisfied without
-# depending on whatever path the package happens to unpack into.
+# The package we stage provides `oss4-libsalsa/libOSSlib.so`, but the runtime
+# loader is searching for a flat `/usr/lib/x86_64-linux-gnu/libOSSlib.so` path.
+# Point the flat path at the package-provided filename without overriding ALSA.
 mkdir -p "$DEST_DIR/usr/lib/x86_64-linux-gnu"
 if [[ ! -e "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so" ]]; then
-  echo "Creating OSS compatibility symlink: $DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so -> liboss4-salsa.so.2"
-  ln -s "liboss4-salsa.so.2" "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so"
-fi
-if [[ ! -e "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so.1" ]]; then
-  echo "Creating OSS compatibility symlink: $DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so.1 -> liboss4-salsa.so.2"
-  ln -s "liboss4-salsa.so.2" "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so.1"
+  echo "Creating OSS compatibility symlink: $DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so -> oss4-libsalsa/libOSSlib.so"
+  mkdir -p "$DEST_DIR/usr/lib/x86_64-linux-gnu/oss4-libsalsa"
+  ln -s "oss4-libsalsa/libOSSlib.so" "$DEST_DIR/usr/lib/x86_64-linux-gnu/libOSSlib.so"
 fi
 
