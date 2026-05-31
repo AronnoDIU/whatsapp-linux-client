@@ -31,6 +31,7 @@ jobs:
 
     env:
       SNAP_CHANNEL: ${{ github.event.inputs.channel || 'stable' }}
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
 
     steps:
       - name: Checkout
@@ -56,17 +57,13 @@ jobs:
       - name: Install Snapcraft
         run: sudo snap install snapcraft --classic
 
-      - name: Login to Snapcraft
-        env:
-          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
+      - name: Validate Snapcraft credentials
         run: |
-          if [ -z "$SNAPCRAFT_LOGIN_FILE" ]; then
+          if [ -z "$SNAPCRAFT_STORE_CREDENTIALS" ]; then
             echo "SNAPCRAFT_LOGIN_FILE secret is missing" >&2
             exit 1
           fi
-          LOGIN_FILE="$RUNNER_TEMP/snapcraft.login"
-          printf '%s' "$SNAPCRAFT_LOGIN_FILE" > "$LOGIN_FILE"
-          snapcraft login --with "$LOGIN_FILE"
+          echo "Snapcraft credentials detected."
 
       - name: Upload and release Snap
         run: |
