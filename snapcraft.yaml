@@ -68,8 +68,4 @@ parts:
       - libxcursor1
       - libxkbcommon0
 
-  graphics-core22:
-    interface: content
-    target: $SNAP/graphics-core22
-    default-provider: graphics-core22
 
