@@ -1,6 +1,6 @@
 name: whats-tux
 title: WhatsApp Linux Client
-base: core22
+base: core24
 version: "0.1.0"
 summary: WhatsApp Web desktop client for Linux
 description: |
@@ -67,6 +67,6 @@ parts:
       - libxi6
       - libxcursor1
       - libxkbcommon0
-      # Graphics and GPU support (packages verified in core22)
+      # Graphics and GPU support (packages verified in core24)
       - libgbm1
       - libdrm2
