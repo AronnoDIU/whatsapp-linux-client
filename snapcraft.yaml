@@ -34,6 +34,7 @@ apps:
       - desktop
       - desktop-legacy
       - gsettings
+      - graphics-core22
       - home
       - network
       - network-bind
@@ -66,8 +67,9 @@ parts:
       - libxi6
       - libxcursor1
       - libxkbcommon0
-      # Graphics and GPU support
-      - libgbm1
-      - libgl1-mesa-glx
-      - libdrm2
+
+  graphics-core22:
+    interface: content
+    target: $SNAP/graphics-core22
+    default-provider: graphics-core22
 
