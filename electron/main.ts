@@ -14,6 +14,43 @@ app.commandLine.appendSwitch('disable-dev-shm-usage')
 const chromeLikeUA =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
+function buildBengaliTypographyCSS() {
+  return `
+    :root,
+    html,
+    body,
+    button,
+    input,
+    textarea,
+    select,
+    option,
+    [contenteditable="true"],
+    [lang="bn"],
+    :lang(bn) {
+      font-family:
+        "Noto Sans Bengali",
+        "Noto Serif Bengali",
+        "Noto Sans",
+        "Noto Serif",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif !important;
+      font-kerning: normal !important;
+      font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+      text-rendering: optimizeLegibility !important;
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+    }
+
+    .emoji,
+    [aria-label*="emoji" i] {
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
+    }
+  `
+}
+
 let tray: Tray | null = null
 
 function createMainWindow(partition = 'persist:default') {
@@ -37,6 +74,14 @@ function createMainWindow(partition = 'persist:default') {
   win.webContents.session.setUserAgent(chromeLikeUA)
   win.loadURL('https://web.whatsapp.com', { userAgent: chromeLikeUA }).catch((err) => {
     console.error('Failed to load WhatsApp Web:', err)
+  })
+
+  win.webContents.on('did-finish-load', async () => {
+    try {
+      await win.webContents.insertCSS(buildBengaliTypographyCSS())
+    } catch (err) {
+      console.warn('Failed to inject Bengali typography CSS', err)
+    }
   })
 
   win.once('ready-to-show', () => {

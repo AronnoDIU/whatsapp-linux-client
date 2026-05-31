@@ -59,6 +59,9 @@
     "grade": "stable",
     "summary": "WhatsApp Web desktop client for Linux",
     "description": "Unofficial desktop wrapper for WhatsApp Web with tray support, desktop notifications, and Linux-focused screen-sharing compatibility.",
+    "stagePackages": [
+      "fonts-noto-core"
+    ],
     "plugs": [
       "network",
       "network-bind",
