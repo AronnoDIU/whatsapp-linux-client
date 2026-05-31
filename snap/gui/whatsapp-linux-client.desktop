@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=WhatsApp Linux Client
 Comment=Unofficial desktop wrapper for WhatsApp Web on Linux
-Exec=whatsapp-linux-client %U
+Exec=whats-tux %U
 Terminal=false
 Type=Application
 Icon=${SNAP}/meta/gui/icon.png
