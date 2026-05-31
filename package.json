@@ -27,9 +27,9 @@
     "build": "electron-vite build",
     "dist:linux": "npm run icons:generate && electron-vite build && electron-builder --linux",
     "dist:linux:dir": "npm run icons:generate && electron-vite build && electron-builder --linux dir",
-    "dist:snap": "npm run icons:generate && electron-vite build && electron-builder --linux snap",
+    "dist:snap": "npm run snapcraft:build",
     "snapcraft:prepare": "bash ./scripts/prepare-snapcraft.sh",
-    "snapcraft:build": "npm run dist:linux:dir && npm run snapcraft:prepare && snapcraft pack --destructive-mode",
+    "snapcraft:build": "npm run dist:linux:dir && npm run snapcraft:prepare && bash ./scripts/build-snapcraft.sh",
     "preview": "electron-vite preview"
   },
   "dependencies": {
