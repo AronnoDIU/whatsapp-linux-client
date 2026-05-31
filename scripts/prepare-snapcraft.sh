@@ -68,5 +68,27 @@ while IFS= read -r libfile; do
     echo "Creating OSS compatibility symlink: $target_name -> $(basename "$libfile")"
     ln -s "$(basename "$libfile")" "$target_name" || true
   fi
+
 done < <(find "$DEST_DIR" -type f -iname 'liboss*.so*' -print)
+
+# Also create common global symlinks in /usr/lib and /usr/lib/<triplet> so that
+# libraries looked up by absolute names or via different loader paths are
+# satisfied. This covers cases where consumers reference /usr/lib/libOSSlib.so
+# instead of the soname under arch-specific directories.
+for libfile in $(find "$DEST_DIR" -type f -iname 'liboss*.so*' -print); do
+  libname=$(basename "$libfile")
+  # where to place additional symlinks
+  for d in "$DEST_DIR/usr/lib" "$DEST_DIR/usr/lib/$(basename "$(dirname "$libfile")")"; do
+    if [[ -d "$d" ]]; then
+      if [[ ! -e "$d/libOSSlib.so" ]]; then
+        echo "Creating additional OSS compatibility symlink: $d/libOSSlib.so -> $libname"
+        ln -s "$libname" "$d/libOSSlib.so" || true
+      fi
+      if [[ ! -e "$d/libOSSlib.so.1" ]]; then
+        echo "Creating additional OSS compatibility symlink: $d/libOSSlib.so.1 -> $libname"
+        ln -s "$libname" "$d/libOSSlib.so.1" || true
+      fi
+    fi
+  done
+done
 
