@@ -24,5 +24,13 @@ if [[ ! -f "$ROOT_DIR/snap/gui/icon.png" ]]; then
   exit 1
 fi
 
+# Some snap templates expect the application to be inside a directory named after the
+# repository (e.g. "whatsapp-linux-client"). Ensure that name exists alongside the
+# unpacked contents so `snapcraft pack` can find the expected path.
+REPO_NAME="$(basename "$ROOT_DIR")"
+if [[ ! -e "$DEST_DIR/$REPO_NAME" ]]; then
+  mkdir -p "$DEST_DIR/$REPO_NAME"
+  cp -a "$DEST_DIR/." "$DEST_DIR/$REPO_NAME/"
+fi
 echo "Prepared snapcraft source directory at: $DEST_DIR"
 
