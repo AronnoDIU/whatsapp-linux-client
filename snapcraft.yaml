@@ -48,3 +48,20 @@ parts:
     source: release/snapcraft/linux-unpacked
     stage:
       - "*"
+    stage-packages:
+      # Required for Electron runtime
+      - libnss3
+      - libxss1
+      - libappindicator3-1
+      - libgconf-2-4
+      - libxkbfile1
+      - libgbm1
+      - libgl1-mesa-glx
+      # Optional but recommended for better experience
+      - libpulse0
+      - libxcomposite1
+      - libxdamage1
+      - libxfixes3
+      - libxrandr2
+      - libxrender1
+      - libxtst6
