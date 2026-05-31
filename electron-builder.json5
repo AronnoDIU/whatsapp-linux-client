@@ -4,7 +4,7 @@
   "appId": "io.github.aronno.whatsapplinuxclient",
   "asar": true,
   "productName": "WhatsApp Linux Client",
-  "executableName": "whatsapp-linux-client",
+  "executableName": "whats-tux",
   "directories": {
     "output": "release/${version}"
   },

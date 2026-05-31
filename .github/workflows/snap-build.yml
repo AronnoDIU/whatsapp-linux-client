@@ -29,21 +29,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick
 
-      - name: Install Snapcraft
-        run: sudo snap install snapcraft --classic
-
       - name: Install dependencies
         run: npm ci
 
       - name: Build Snap artifact
-        run: npm run snapcraft:build
+        run: npm run dist:snap
 
       - name: Upload Snap artifact
         uses: actions/upload-artifact@v4
         with:
           name: snap-package
           path: |
-            ./*.snap
-            release/snapcraft/**
+            release/**/*.snap
+            release/**/builder-effective-config.yaml
           if-no-files-found: error
 

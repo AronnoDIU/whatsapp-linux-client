@@ -51,11 +51,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build Snap artifact
+        run: npm run dist:snap
+
       - name: Install Snapcraft
         run: sudo snap install snapcraft --classic
-
-      - name: Build Snap artifact
-        run: npm run snapcraft:build
 
       - name: Validate Snapcraft credentials
         run: |
@@ -67,7 +67,7 @@ jobs:
 
       - name: Upload and release Snap
         run: |
-          SNAP_FILE="$(find . -maxdepth 3 -type f -name 'whats-tux_*.snap' | head -n 1)"
+          SNAP_FILE="$(find release -type f -name '*.snap' | head -n 1)"
           if [ -z "$SNAP_FILE" ]; then
             echo "No .snap file produced" >&2
             exit 1
