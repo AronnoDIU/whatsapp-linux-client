@@ -23,7 +23,9 @@ architectures:
 
 apps:
   whatsapp-linux-client:
-    command: whatsapp-linux-client
+    # command must match the actual executable produced by electron-builder
+    # our Electron executable name is 'whats-tux' (see electron-builder.json5 executableName)
+    command: whats-tux
     desktop: snap/gui/whats-tux.desktop
     plugs:
       - audio-playback
