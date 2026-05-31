@@ -14,12 +14,17 @@ on:
           - beta
           - edge
   push:
+    branches:
+      - main
     tags:
       - "v*"
 
 jobs:
   publish-snap:
     runs-on: ubuntu-latest
+    concurrency:
+      group: snap-publish-${{ github.ref }}
+      cancel-in-progress: true
     timeout-minutes: 45
     permissions:
       contents: read
