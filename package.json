@@ -24,12 +24,15 @@
   "scripts": {
     "icons:generate": "bash ./scripts/generate-icons.sh",
     "dev": "electron-vite dev",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src electron vite.config.ts electron.vite.config.ts",
     "build": "electron-vite build",
     "dist:linux": "npm run icons:generate && electron-vite build && electron-builder --linux",
     "dist:linux:dir": "npm run icons:generate && electron-vite build && electron-builder --linux dir",
     "dist:snap": "npm run snapcraft:build",
     "snapcraft:prepare": "bash ./scripts/prepare-snapcraft.sh",
     "snapcraft:build": "npm run dist:linux:dir && npm run snapcraft:prepare && bash ./scripts/build-snapcraft.sh",
+    "validate:prepush": "node .local-tools/prepush/buildcheck.mjs",
     "preview": "electron-vite preview"
   },
   "dependencies": {

@@ -35,3 +35,6 @@ parts/
 .cache
 node_modules/
 
+# Local-only pre-push build validator
+.local-tools/
+

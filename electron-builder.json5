@@ -49,8 +49,7 @@
       }
     },
     "target": [
-      "AppImage",
-      "snap"
+      "AppImage"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
   },
