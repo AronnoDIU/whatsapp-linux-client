@@ -52,7 +52,9 @@ jobs:
         run: npm ci
 
       - name: Install Snapcraft
-        run: sudo snap install snapcraft --classic
+        run: |
+          sudo snap install snapcraft --classic
+          echo "/snap/bin" >> "$GITHUB_PATH"
 
       - name: Build Snap artifact
         run: npm run dist:snap
