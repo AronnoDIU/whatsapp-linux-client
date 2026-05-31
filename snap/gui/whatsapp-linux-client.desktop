@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=WhatsApp Linux Client
+Comment=Unofficial desktop wrapper for WhatsApp Web on Linux
+Exec=whatsapp-linux-client %U
+Terminal=false
+Type=Application
+Icon=${SNAP}/meta/gui/icon.png
+Categories=Network;Chat;InstantMessaging;
+Keywords=WhatsApp;Chat;Messaging;Linux;
+StartupWMClass=WhatsApp Linux Client
+StartupNotify=true
+

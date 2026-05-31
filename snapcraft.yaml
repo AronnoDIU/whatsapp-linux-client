@@ -1,0 +1,47 @@
+name: whats-tux
+title: WhatsApp Linux Client
+base: core22
+version: "0.1.0"
+summary: WhatsApp Web desktop client for Linux
+description: |
+  Unofficial desktop wrapper for WhatsApp Web with tray support,
+  native notifications, multi-account windows, and Linux-focused
+  screen-sharing compatibility.
+
+grade: stable
+confinement: strict
+compression: lzo
+icon: snap/gui/icon.png
+website: https://github.com/aronno/whatsapp-linux-client
+source-code: https://github.com/aronno/whatsapp-linux-client
+issues: https://github.com/aronno/whatsapp-linux-client/issues
+contact: https://github.com/aronno/whatsapp-linux-client/issues
+
+architectures:
+  - build-on: amd64
+
+apps:
+  whatsapp-linux-client:
+    command: whatsapp-linux-client
+    desktop: snap/gui/whats-tux.desktop
+    plugs:
+      - audio-playback
+      - audio-record
+      - camera
+      - desktop
+      - desktop-legacy
+      - gsettings
+      - home
+      - network
+      - network-bind
+      - opengl
+      - unity7
+      - wayland
+      - x11
+
+parts:
+  app:
+    plugin: dump
+    source: release/snapcraft/linux-unpacked
+    stage:
+      - "*"

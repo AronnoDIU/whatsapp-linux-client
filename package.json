@@ -1,20 +1,40 @@
 {
-  "name": "whatsapp-linux-client",
+  "name": "whats-tux",
+  "description": "An Electron-based desktop client for WhatsApp Web on Linux.",
+  "author": "Aronno",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/aronno/whatsapp-linux-client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aronno/whatsapp-linux-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aronno/whatsapp-linux-client/issues"
+  },
+  "keywords": [
+    "whatsapp",
+    "electron",
+    "linux",
+    "snap",
+    "chat"
+  ],
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "icons:generate": "bash ./scripts/generate-icons.sh",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "dist:linux": "npm run icons:generate && electron-vite build && electron-builder --linux",
+    "dist:linux:dir": "npm run icons:generate && electron-vite build && electron-builder --linux dir",
+    "dist:snap": "npm run icons:generate && electron-vite build && electron-builder --linux snap",
+    "snapcraft:prepare": "bash ./scripts/prepare-snapcraft.sh",
+    "snapcraft:build": "npm run dist:linux:dir && npm run snapcraft:prepare && snapcraft pack --destructive-mode",
     "preview": "electron-vite preview"
   },
   "dependencies": {
-    "electron-store": "^11.0.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^7.15.1",
-    "tailwindcss": "^4.3.0",
-    "zustand": "^5.0.13"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
@@ -22,7 +42,7 @@
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react": "^4.2.1",
-    "electron": "^32.0.0",
+    "electron": "^32.3.3",
     "electron-builder": "^26.8.1",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",

@@ -19,7 +19,9 @@ function createMainWindow(partition = 'persist:default') {
   const win = new BrowserWindow({
     width: 1400,
     height: 900,
-    show: true,
+    show: false,
+    backgroundColor: '#0f172a',
+    autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -34,6 +36,20 @@ function createMainWindow(partition = 'persist:default') {
   win.webContents.session.setUserAgent(chromeLikeUA)
   win.loadURL('https://web.whatsapp.com', { userAgent: chromeLikeUA }).catch((err) => {
     console.error('Failed to load WhatsApp Web:', err)
+  })
+
+  win.once('ready-to-show', () => {
+    if (!win.isDestroyed()) {
+      win.show()
+      win.focus()
+    }
+  })
+
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'Escape' && win.isFullScreen()) {
+      event.preventDefault()
+      win.setFullScreen(false)
+    }
   })
 
   // Native display-capture handler for WhatsApp screen sharing (and call flows that probe capture support)
@@ -96,6 +112,8 @@ function createTray(win: BrowserWindow) {
   // create a tray icon with a context menu
   try {
     const candidates = [
+      path.join(__dirname, '../../public/tray-icon.png'),
+      path.join(__dirname, '../../public/app-icon.png'),
       path.join(__dirname, '../../public/electron-vite.svg'),
       path.join(__dirname, '../../public/vite.svg')
     ]

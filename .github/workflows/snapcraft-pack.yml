@@ -1,0 +1,36 @@
+name: Snapcraft Pack
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pack-with-snapcraft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+
+      - name: Build snap via snapcraft.yaml
+        run: npm run snapcraft:build
+
+      - name: Upload Snapcraft artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapcraft-package
+          path: '*.snap'
+          if-no-files-found: error
+

@@ -73,6 +73,124 @@ The build output is generated under:
 - `dist-electron/main/` for the Electron main process bundle
 - `dist-electron/preload/` for the preload bundle
 
+## Ubuntu Snap Store / App Center packaging
+
+This repository is configured for both:
+
+- **electron-builder Snap packaging** (`npm run dist:snap`) for quick production artifacts
+- **snapcraft.yaml-based packaging** (`npm run snapcraft:build`) for full Snapcraft workflows
+
+It also includes CI/CD workflows for automatic Snap build and publish.
+
+### Packaging scripts
+
+- `npm run dist:linux` — build the app and generate both AppImage and Snap artifacts
+- `npm run dist:snap` — build the app and generate only the Snap artifact (`whats-tux`)
+- `npm run dist:linux:dir` — build unpacked Linux app output for Snapcraft
+- `npm run icons:generate` — generate branded icon assets (`512x512`, `1024x1024`)
+- `npm run snapcraft:prepare` — prepare `release/snapcraft/linux-unpacked` from build output
+- `npm run snapcraft:build` — build the Snap using `snapcraft.yaml`
+
+### Branding assets for store review
+
+Generated branding files:
+
+- `build/icons/icon-512.png`
+- `build/icons/icon-1024.png`
+- `snap/gui/icon.png` (used by Snap metadata)
+- `snap/gui/icon-1024.png` (store-review asset)
+
+Regenerate anytime:
+
+```bash
+npm run icons:generate
+```
+
+### Build locally (electron-builder)
+
+```bash
+npm install
+npm run dist:snap
+```
+
+The Snap artifact will be written to the `release/<version>/` folder.
+
+### Build locally (snapcraft.yaml)
+
+Install Snapcraft first (one-time):
+
+```bash
+sudo snap install snapcraft --classic
+```
+
+Then build using the Snapcraft project file:
+
+```bash
+npm install
+npm run snapcraft:build
+```
+
+This produces a `.snap` in the repository root.
+
+### Publish to Snap Store
+
+1. Create/register your Snap name once:
+
+```bash
+snapcraft login
+snapcraft register whats-tux
+```
+
+2. Build the `.snap` artifact (local or CI)
+3. Test locally if needed:
+
+```bash
+sudo snap install --dangerous release/<version>/*.snap
+```
+
+4. Upload and release manually:
+
+```bash
+snapcraft upload release/<version>/*.snap --release=stable
+```
+
+### CI/CD: automatic Snap build and publish
+
+Workflows included:
+
+- `.github/workflows/snap-build.yml` — automatically builds Snap (`electron-builder`) on push/PR and uploads artifact
+- `.github/workflows/snap-publish.yml` — automatically publishes Snap on tag push (`v*`) or manual dispatch
+- `.github/workflows/snapcraft-pack.yml` — manual Snapcraft (`snapcraft.yaml`) pack workflow for review/testing
+
+Required GitHub secret for publish workflow:
+
+- `SNAPCRAFT_LOGIN_FILE`
+
+Generate login credentials file locally:
+
+```bash
+snapcraft login
+snapcraft export-login --snaps whats-tux --channels stable -
+```
+
+Copy the exported content and save it as repository secret `SNAPCRAFT_LOGIN_FILE`.
+
+### Desktop entry and store-listing polish
+
+This repository now includes:
+
+- polished desktop metadata in `electron-builder.json5` (`Name`, `Comment`, `Categories`, `Keywords`, `StartupWMClass`)
+- dedicated Snap desktop entry at `snap/gui/whatsapp-linux-client.desktop`
+- cleaned branding metadata in `package.json` (`homepage`, `repository`, `bugs`, `keywords`)
+
+### Notes
+
+- The Linux bundle includes `public/` so tray icons and other runtime assets are available in packaged builds.
+- Snap/App Center icon generation is automated from `build/icon.svg`.
+- Press `Esc` to leave fullscreen.
+- Replace `build/icon.svg` and run `npm run icons:generate` to fully rebrand all icon outputs.
+- Local `snapcraft pack --destructive-mode` may print linter warnings for bundled Electron libraries; CI release flow uses `electron-builder` Snap output for a stable pipeline.
+
 ## Preview
 
 Preview the production build locally:
@@ -87,6 +205,12 @@ The available package scripts are:
 
 - `npm run dev` — start the app in development mode
 - `npm run build` — build the application for production
+- `npm run dist:linux` — build AppImage and Snap Linux packages
+- `npm run dist:snap` — build only the Snap package
+- `npm run dist:linux:dir` — build unpacked Linux output
+- `npm run icons:generate` — generate 512/1024 icon set and packaging icons
+- `npm run snapcraft:prepare` — prepare unpacked build for `snapcraft.yaml`
+- `npm run snapcraft:build` — build Snap from `snapcraft.yaml`
 - `npm run preview` — preview the production build
 
 ## Project Structure

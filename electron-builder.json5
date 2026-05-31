@@ -1,15 +1,17 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "io.github.aronno.whatsapplinuxclient",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "WhatsApp Linux Client",
+  "executableName": "whatsapp-linux-client",
   "directories": {
     "output": "release/${version}"
   },
   "files": [
-    "dist",
-    "dist-electron"
+    "dist/**/*",
+    "dist-electron/**/*",
+    "public/**/*"
   ],
   "mac": {
     "target": [
@@ -35,9 +37,41 @@
     "deleteAppDataOnUninstall": false
   },
   "linux": {
+    "category": "Chat",
+    "icon": "build/icon.png",
+    "desktop": {
+      "entry": {
+        "Name": "WhatsApp Linux Client",
+        "Comment": "Unofficial desktop wrapper for WhatsApp Web on Linux",
+        "Categories": "Network;Chat;InstantMessaging;",
+        "Keywords": "WhatsApp;Chat;Messaging;Linux;",
+        "StartupWMClass": "WhatsApp Linux Client"
+      }
+    },
     "target": [
-      "AppImage"
+      "AppImage",
+      "snap"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
+  },
+  "snap": {
+    "confinement": "strict",
+    "grade": "stable",
+    "summary": "WhatsApp Web desktop client for Linux",
+    "description": "Unofficial desktop wrapper for WhatsApp Web with tray support, desktop notifications, and Linux-focused screen-sharing compatibility.",
+    "plugs": [
+      "network",
+      "network-bind",
+      "desktop",
+      "desktop-legacy",
+      "wayland",
+      "x11",
+      "unity7",
+      "opengl",
+      "audio-playback",
+      "audio-record",
+      "camera",
+      "screen-inhibit"
+    ]
   }
 }

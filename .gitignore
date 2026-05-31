@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Electron / Snap build artifacts
+release/
+dist-electron/
+prime/
+stage/
+parts/
+*.snap
+
+# Build cache / temp
+.cache
+node_modules/
+

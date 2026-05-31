@@ -1,0 +1,70 @@
+name: Snap Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Snap channel"
+        required: true
+        default: stable
+        type: choice
+        options:
+          - stable
+          - candidate
+          - beta
+          - edge
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish-snap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    env:
+      SNAP_CHANNEL: ${{ github.event.inputs.channel || 'stable' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Snap artifact
+        run: npm run dist:snap
+
+      - name: Install Snapcraft
+        run: sudo snap install snapcraft --classic
+
+      - name: Login to Snapcraft
+        env:
+          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
+        run: |
+          if [ -z "$SNAPCRAFT_LOGIN_FILE" ]; then
+            echo "SNAPCRAFT_LOGIN_FILE secret is missing" >&2
+            exit 1
+          fi
+          LOGIN_FILE="$RUNNER_TEMP/snapcraft.login"
+          printf '%s' "$SNAPCRAFT_LOGIN_FILE" > "$LOGIN_FILE"
+          snapcraft login --with "$LOGIN_FILE"
+
+      - name: Upload and release Snap
+        run: |
+          SNAP_FILE="$(find release -type f -name '*.snap' | head -n 1)"
+          if [ -z "$SNAP_FILE" ]; then
+            echo "No .snap file produced" >&2
+            exit 1
+          fi
+          echo "Uploading $SNAP_FILE to channel '$SNAP_CHANNEL'"
+          snapcraft upload "$SNAP_FILE" --release="$SNAP_CHANNEL"
+
