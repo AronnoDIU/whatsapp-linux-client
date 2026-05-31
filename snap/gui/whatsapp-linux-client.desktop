@@ -1,6 +1,9 @@
+
 [Desktop Entry]
-Name=WhatsApp Linux Client
-Comment=Unofficial desktop wrapper for WhatsApp Web on Linux
+Name=WhatsApp Linux Client (disabled duplicate)
+Hidden=true
+NoDisplay=true
+Comment=Disabled duplicate desktop entry. Keep only snap/gui/whats-tux.desktop.
 Exec=whats-tux %U
 Terminal=false
 Type=Application

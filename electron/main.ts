@@ -4,6 +4,26 @@ import path from 'node:path'
 import fs from 'node:fs'
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
+// Enforce single instance: if a second instance is started, focus the existing window
+// Move this as early as possible so additional launches quit immediately.
+const gotLock = app.requestSingleInstanceLock()
+if (!gotLock) {
+  // Another instance is already running - quit this one
+  app.quit()
+  // ensure immediate exit
+  process.exit(0)
+} else {
+  app.on('second-instance', () => {
+    // Someone tried to run a second instance, focus the main window if available
+    const win = mainWindow || BrowserWindow.getAllWindows()[0]
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.show()
+      win.focus()
+    }
+  })
+}
+
 // Improve WebRTC / screen capture support on Linux (PipeWire)
 app.commandLine.appendSwitch('enable-features', 'WebRTCPipeWireCapturer')
 app.commandLine.appendSwitch('enable-usermedia-screen-capturing')
@@ -94,6 +114,7 @@ function buildBengaliTypographyCSS() {
 }
 
 let tray: Tray | null = null
+let mainWindow: BrowserWindow | null = null
 
 function createMainWindow(partition = 'persist:default') {
   const state = loadWindowState()
@@ -304,16 +325,23 @@ function createTray(win: BrowserWindow) {
 
 app.whenReady().then(() => {
   // Create primary window using default persistent partition (stores cookies)
-  const win = createMainWindow('persist:default')
+  mainWindow = createMainWindow('persist:default')
+
+  // When the main window is closed, clear reference
+  mainWindow.on('closed', () => {
+    // saveWindowState already runs on 'close' — just clear ref
+    mainWindow = null
+  })
 
   // Create tray
-  createTray(win)
+  createTray(mainWindow)
 
   // Register a convenient global shortcut to toggle visibility
   try {
     globalShortcut.register('Control+Alt+W', () => {
-      if (win.isVisible()) win.hide()
-      else win.show()
+      if (!mainWindow) return
+      if (mainWindow.isVisible()) mainWindow.hide()
+      else mainWindow.show()
     })
   } catch (e) {
     console.warn('Could not register global shortcut', e)
