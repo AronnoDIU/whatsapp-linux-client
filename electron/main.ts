@@ -25,8 +25,8 @@ function createMainWindow(partition = 'persist:default') {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      // preload is built to dist-electron/preload/index.js when built by electron-vite
-      preload: path.join(__dirname, '../preload/index.js'),
+        // electron-vite builds the preload bundle to dist-electron/preload/preload.mjs
+        preload: path.join(__dirname, '../preload/preload.mjs'),
       partition
     }
   })
