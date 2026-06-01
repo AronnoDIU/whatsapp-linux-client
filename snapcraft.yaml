@@ -1,6 +1,6 @@
 name: whats-tux
 title: WhatsApp for Linux
-base: core20
+base: core24
 version: "0.1.0"
 summary: WhatsApp Web desktop client for Linux
 description: |
@@ -50,6 +50,11 @@ website: https://github.com/AronnoDIU
 source-code: https://github.com/AronnoDIU/whatsapp-linux-client
 issues: https://github.com/AronnoDIU/whatsapp-linux-client/issues
 contact: https://www.linkedin.com/in/yeasirarafataronno/
+
+platforms:
+  amd64:
+    build-on: amd64
+    build-for: amd64
 
 apps:
   whats-tux:
@@ -104,7 +109,8 @@ parts:
       - libxss1
       - libappindicator3-1
       - libxkbfile1
-      - libasound2
+      - libpulse0
+      - libasound2t64
       - libxcomposite1
       - libxdamage1
       - libxfixes3
@@ -116,3 +122,6 @@ parts:
       - libxi6
       - libxcursor1
       - libxkbcommon0
+      # Graphics and GPU support (packages verified in core24)
+      - libgbm1
+      - libdrm2
