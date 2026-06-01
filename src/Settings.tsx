@@ -14,6 +14,15 @@ interface AppSettings {
     languages: string[]
   }
   zoomLevel: number
+  notifications: {
+    enabled: boolean
+    showPreview: boolean
+    enableActions: boolean
+    customSound: string
+    dndEnabled: boolean
+    dndStartHour: number
+    dndEndHour: number
+  }
 }
 
 declare global {
@@ -160,6 +169,111 @@ function Settings() {
             Note: Bangla spell check is not supported by Electron's built-in spell checker
           </p>
         </div>
+      </section>
+
+      {/* Notifications Section */}
+      <section className="settings-section">
+        <h3>Notifications</h3>
+        <div className="setting-item">
+          <label htmlFor="notificationsEnabled">Enable Notifications</label>
+          <input
+            type="checkbox"
+            id="notificationsEnabled"
+            checked={settings.notifications.enabled}
+            onChange={(e) => {
+              const newNotifications = { ...settings.notifications, enabled: e.target.checked }
+              updateSetting('notifications', newNotifications)
+            }}
+          />
+        </div>
+
+        <div className="setting-item">
+          <label htmlFor="showPreview">Show Message Preview</label>
+          <input
+            type="checkbox"
+            id="showPreview"
+            checked={settings.notifications.showPreview}
+            onChange={(e) => {
+              const newNotifications = { ...settings.notifications, showPreview: e.target.checked }
+              updateSetting('notifications', newNotifications)
+            }}
+          />
+          <span className="setting-description">
+            Show message content in notifications
+          </span>
+        </div>
+
+        <div className="setting-item">
+          <label htmlFor="enableActions">Enable Notification Actions</label>
+          <input
+            type="checkbox"
+            id="enableActions"
+            checked={settings.notifications.enableActions}
+            onChange={(e) => {
+              const newNotifications = { ...settings.notifications, enableActions: e.target.checked }
+              updateSetting('notifications', newNotifications)
+            }}
+          />
+          <span className="setting-description">
+            Add Reply and Mark as Read buttons to notifications
+          </span>
+        </div>
+
+        <div className="setting-item">
+          <label htmlFor="dndEnabled">Do Not Disturb Mode</label>
+          <input
+            type="checkbox"
+            id="dndEnabled"
+            checked={settings.notifications.dndEnabled}
+            onChange={(e) => {
+              const newNotifications = { ...settings.notifications, dndEnabled: e.target.checked }
+              updateSetting('notifications', newNotifications)
+            }}
+          />
+          <span className="setting-description">
+            Mute notifications during specific hours
+          </span>
+        </div>
+
+        {settings.notifications.dndEnabled && (
+          <>
+            <div className="setting-item">
+              <label htmlFor="dndStartHour">DND Start Hour</label>
+              <input
+                type="number"
+                id="dndStartHour"
+                min="0"
+                max="23"
+                value={settings.notifications.dndStartHour}
+                onChange={(e) => {
+                  const newNotifications = { ...settings.notifications, dndStartHour: parseInt(e.target.value) }
+                  updateSetting('notifications', newNotifications)
+                }}
+              />
+              <span className="setting-description">
+                (0-23, 24-hour format)
+              </span>
+            </div>
+
+            <div className="setting-item">
+              <label htmlFor="dndEndHour">DND End Hour</label>
+              <input
+                type="number"
+                id="dndEndHour"
+                min="0"
+                max="23"
+                value={settings.notifications.dndEndHour}
+                onChange={(e) => {
+                  const newNotifications = { ...settings.notifications, dndEndHour: parseInt(e.target.value) }
+                  updateSetting('notifications', newNotifications)
+                }}
+              />
+              <span className="setting-description">
+                (0-23, 24-hour format)
+              </span>
+            </div>
+          </>
+        )}
       </section>
 
       {/* Zoom Section */}

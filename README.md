@@ -43,6 +43,14 @@ The app loads WhatsApp Web with a Chrome-like user agent and adds a set of compa
 - **Settings UI** - Beautiful settings panel accessible from the app or system tray
 - **Real-time Updates** - Changes apply instantly without restart
 
+### 🔔 Enhanced Notifications
+
+- **Notification Actions** - Quick reply and mark as read buttons in notifications
+- **Message Preview** - Show message content in notifications (toggleable)
+- **Do Not Disturb Mode** - Mute notifications during specific hours
+- **Notification Control** - Enable/disable notifications globally
+- **Smart DND** - Automatically suppress notifications during configured quiet hours
+
 ## Prerequisites
 
 - **Node.js 18+** is recommended

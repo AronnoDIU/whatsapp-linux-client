@@ -14,6 +14,15 @@ export interface AppSettings {
     languages: string[]
   }
   zoomLevel: number
+  notifications: {
+    enabled: boolean
+    showPreview: boolean
+    enableActions: boolean
+    customSound: string
+    dndEnabled: boolean
+    dndStartHour: number
+    dndEndHour: number
+  }
 }
 
 const defaultSettings: AppSettings = {
@@ -29,7 +38,16 @@ const defaultSettings: AppSettings = {
     enabled: true,
     languages: ['en-US']
   },
-  zoomLevel: 1.0
+  zoomLevel: 1.0,
+  notifications: {
+    enabled: true,
+    showPreview: true,
+    enableActions: true,
+    customSound: '',
+    dndEnabled: false,
+    dndStartHour: 22,
+    dndEndHour: 8
+  }
 }
 
 const store = new Store<AppSettings>({

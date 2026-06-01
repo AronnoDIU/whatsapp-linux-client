@@ -25,7 +25,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
 // Expose higher-level helpers under window.whatsappNative
 contextBridge.exposeInMainWorld('whatsappNative', {
-  showNotification: (title: string, body?: string) => ipcRenderer.send('native-notification', { title, body }),
+  showNotification: (title: string, body?: string, replyId?: string) => ipcRenderer.send('native-notification', { title, body, replyId }),
   openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
   createNewAccountWindow: () => ipcRenderer.send('create-new-account'),
   pickFiles: (options?: Electron.OpenDialogOptions) => ipcRenderer.invoke('dialog:openFiles', options),

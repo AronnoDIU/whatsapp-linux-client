@@ -115,14 +115,7 @@ function buildBengaliTypographyCSS() {
 }
 
 function buildThemeCSS() {
-  const darkMode = settings.get('darkMode')
   const compactMode = settings.get('compactMode')
-  
-  // Determine if dark mode should be active
-  let isDark = darkMode === 'dark'
-  if (darkMode === 'auto') {
-    isDark = nativeTheme.shouldUseDarkColors
-  }
 
   return `
     /* Compact mode styles */
@@ -130,7 +123,7 @@ function buildThemeCSS() {
       .two, .three, .four {
         padding: 4px !important;
         margin: 2px !important;
-      }
+      } 
       
       [data-testid="conversation-panel-header"] {
         padding: 8px !important;
@@ -437,9 +430,78 @@ app.whenReady().then(() => {
 })
 
 // IPC handlers for the preload exposed API
-ipcMain.on('native-notification', (_event, { title, body }) => {
+ipcMain.on('native-notification', (_event, { title, body, replyId }) => {
   try {
-    const n = new Notification({ title, body })
+    const notificationSettings = settings.get('notifications')
+    
+    // Check if notifications are enabled
+    if (!notificationSettings.enabled) {
+      return
+    }
+    
+    // Check Do Not Disturb mode
+    if (notificationSettings.dndEnabled) {
+      const now = new Date()
+      const currentHour = now.getHours()
+      const startHour = notificationSettings.dndStartHour
+      const endHour = notificationSettings.dndEndHour
+      
+      // Check if current time is within DND period
+      let inDndPeriod = false
+      if (startHour < endHour) {
+        // Same day period (e.g., 22:00 to 08:00 next day)
+        inDndPeriod = currentHour >= startHour || currentHour < endHour
+      } else {
+        // Same day period (e.g., 22:00 to 02:00)
+        inDndPeriod = currentHour >= startHour && currentHour < endHour
+      }
+      
+      if (inDndPeriod) {
+        console.log('Notification suppressed due to DND mode')
+        return
+      }
+    }
+    
+    const notificationOptions: Electron.NotificationConstructorOptions = {
+      title,
+      body: notificationSettings.showPreview ? body : 'New message',
+      silent: notificationSettings.customSound !== ''
+    }
+    
+    // Add notification actions if enabled
+    if (notificationSettings.enableActions && replyId) {
+      notificationOptions.actions = [
+        { type: 'button', text: 'Reply' },
+        { type: 'button', text: 'Mark as Read' }
+      ]
+    }
+    
+    const n = new Notification(notificationOptions)
+    
+    // Handle notification actions
+    if (notificationSettings.enableActions) {
+      n.on('action', (_event, actionIndex) => {
+        if (actionIndex === 0) {
+          // Reply button clicked
+          console.log('Reply action triggered for:', replyId)
+          // Send IPC event to renderer to focus the chat
+          BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('notification-reply', replyId)
+          })
+        } else if (actionIndex === 1) {
+          // Mark as Read button clicked
+          console.log('Mark as read action triggered')
+        }
+      })
+    }
+    
+    // Play custom sound if configured
+    if (notificationSettings.customSound) {
+      // Note: Custom sound playback would require additional implementation
+      // For now, we'll log it
+      console.log('Custom sound would play:', notificationSettings.customSound)
+    }
+    
     n.show()
   } catch (e) {
     console.warn('Notification failed', e)
