@@ -1,6 +1,6 @@
 name: whats-tux
 title: WhatsApp for Linux
-base: core24
+base: core20
 version: "0.1.0"
 summary: WhatsApp Web desktop client for Linux
 description: |
@@ -44,7 +44,7 @@ description: |
 grade: stable
 confinement: strict
 license: MIT
-compression: lzo
+compression: xz
 icon: snap/gui/icon.png
 website: https://github.com/AronnoDIU
 source-code: https://github.com/AronnoDIU/whatsapp-linux-client
@@ -83,14 +83,33 @@ parts:
     source: release/snapcraft/linux-unpacked
     stage:
       - "*"
+    override-build: |
+      snapcraftctl stage
+      # Remove unnecessary files to reduce size
+      find $SNAPCRAFT_PART_INSTALL -name "*.map" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "*.ts" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "*.d.ts" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "*.log" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "*.md" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "LICENSE*" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "CHANGELOG*" -delete
+      find $SNAPCRAFT_PART_INSTALL -name "README*" -delete
+      find $SNAPCRAFT_PART_INSTALL -name ".git*" -delete
+      find $SNAPCRAFT_PART_INSTALL -name ".DS_Store" -delete
+      # Remove unnecessary Electron resources
+      rm -rf $SNAPCRAFT_PART_INSTALL/resources/*.pak 2>/dev/null || true
+      rm -rf $SNAPCRAFT_PART_INSTALL/resources/*.bin 2>/dev/null || true
+      # Remove locale files (keep only English)
+      find $SNAPCRAFT_PART_INSTALL/locales -type f ! -name "en-*.pak" -delete 2>/dev/null || true
+      # Remove GPU shader cache
+      rm -rf $SNAPCRAFT_PART_INSTALL/resources/*.dat 2>/dev/null || true
     stage-packages:
-      # Core dependencies for Electron
+      # Minimal dependencies for Electron
       - libnss3
       - libxss1
       - libappindicator3-1
       - libxkbfile1
-      - libpulse0
-      - libasound2t64
+      - libasound2
       - libxcomposite1
       - libxdamage1
       - libxfixes3
@@ -102,8 +121,3 @@ parts:
       - libxi6
       - libxcursor1
       - libxkbcommon0
-      # Graphics and GPU support (packages verified in core24)
-      - libgbm1
-      - libdrm2
-      # OSS compatibility library (legacy audio) - provides libOSSlib.so
-      - liboss4-salsa2
