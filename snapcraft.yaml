@@ -76,6 +76,7 @@ apps:
       - unity7
       - wayland
       - x11
+      - browser-support
 
 parts:
   app:
@@ -125,3 +126,5 @@ parts:
       # Graphics and GPU support (packages verified in core24)
       - libgbm1
       - libdrm2
+      - libgl1
+      - libgl1-mesa-glx
