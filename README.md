@@ -51,6 +51,15 @@ The app loads WhatsApp Web with a Chrome-like user agent and adds a set of compa
 - **Notification Control** - Enable/disable notifications globally
 - **Smart DND** - Automatically suppress notifications during configured quiet hours
 
+### ⚡ Advanced Features
+
+- **Message Search** - Search across all conversations (Ctrl+Alt+S)
+- **Quick Reply Templates** - Save and reuse common responses (Ctrl+Alt+T)
+- **Auto-Reply Mode** - Basic auto-reply for busy mode with keyword triggers (Ctrl+Alt+B)
+- **Productivity Shortcuts** - Additional keyboard shortcuts for power users
+- **Template Management** - Add, remove, and customize quick reply templates
+- **Smart Auto-Reply** - Trigger automatic replies based on specific keywords
+
 ## Prerequisites
 
 - **Node.js 18+** is recommended

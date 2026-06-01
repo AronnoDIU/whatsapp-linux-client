@@ -34,6 +34,12 @@ contextBridge.exposeInMainWorld('whatsappNative', {
   getSettings: () => ipcRenderer.invoke('settings:get'),
   setSetting: (key: string, value: unknown) => ipcRenderer.invoke('settings:set', key, value),
   resetSettings: () => ipcRenderer.invoke('settings:reset'),
+  // Advanced features API
+  searchMessages: (query: string) => ipcRenderer.invoke('search-messages', query),
+  getQuickReplyTemplates: () => ipcRenderer.invoke('get-quick-reply-templates'),
+  addQuickReplyTemplate: (template: string) => ipcRenderer.invoke('add-quick-reply-template', template),
+  removeQuickReplyTemplate: (index: number) => ipcRenderer.invoke('remove-quick-reply-template', index),
+  sendAutoReply: (message: string) => ipcRenderer.invoke('send-auto-reply', message),
   // Provide a desktop-capture fallback for getDisplayMedia (used for screen sharing)
   getDisplayMedia: async (constraints?: MediaStreamConstraints) => {
     // Try to pick a screen source, fall back to the first available source

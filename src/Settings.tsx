@@ -23,6 +23,13 @@ interface AppSettings {
     dndStartHour: number
     dndEndHour: number
   }
+  advanced: {
+    messageSearchEnabled: boolean
+    quickReplyTemplates: string[]
+    autoReplyEnabled: boolean
+    autoReplyMessage: string
+    autoReplyKeywords: string[]
+  }
 }
 
 declare global {
@@ -270,6 +277,116 @@ function Settings() {
               />
               <span className="setting-description">
                 (0-23, 24-hour format)
+              </span>
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* Advanced Features Section */}
+      <section className="settings-section">
+        <h3>Advanced Features</h3>
+        
+        <div className="setting-item">
+          <label htmlFor="messageSearchEnabled">Message Search</label>
+          <input
+            type="checkbox"
+            id="messageSearchEnabled"
+            checked={settings.advanced.messageSearchEnabled}
+            onChange={(e) => {
+              const newAdvanced = { ...settings.advanced, messageSearchEnabled: e.target.checked }
+              updateSetting('advanced', newAdvanced)
+            }}
+          />
+          <span className="setting-description">
+            Enable search across all conversations (Ctrl+Alt+S)
+          </span>
+        </div>
+
+        <div className="setting-item">
+          <label>Quick Reply Templates</label>
+          <div className="quick-reply-templates">
+            {settings.advanced.quickReplyTemplates.map((template, index) => (
+              <div key={index} className="template-item">
+                <span>{template}</span>
+                <button
+                  onClick={() => {
+                    const newAdvanced = { ...settings.advanced }
+                    newAdvanced.quickReplyTemplates = newAdvanced.quickReplyTemplates.filter((_, i) => i !== index)
+                    updateSetting('advanced', newAdvanced)
+                  }}
+                  className="remove-btn"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="add-template">
+            <input
+              type="text"
+              placeholder="Add new template..."
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                  const newAdvanced = { ...settings.advanced }
+                  newAdvanced.quickReplyTemplates = [...newAdvanced.quickReplyTemplates, e.currentTarget.value.trim()]
+                  updateSetting('advanced', newAdvanced)
+                  e.currentTarget.value = ''
+                }
+              }}
+            />
+          </div>
+          <p className="setting-description">
+            Quick access to common responses (Ctrl+Alt+T)
+          </p>
+        </div>
+
+        <div className="setting-item">
+          <label htmlFor="autoReplyEnabled">Auto-Reply (Busy Mode)</label>
+          <input
+            type="checkbox"
+            id="autoReplyEnabled"
+            checked={settings.advanced.autoReplyEnabled}
+            onChange={(e) => {
+              const newAdvanced = { ...settings.advanced, autoReplyEnabled: e.target.checked }
+              updateSetting('advanced', newAdvanced)
+            }}
+          />
+          <span className="setting-description">
+            Automatically reply when busy (Ctrl+Alt+B to toggle)
+          </span>
+        </div>
+
+        {settings.advanced.autoReplyEnabled && (
+          <>
+            <div className="setting-item">
+              <label htmlFor="autoReplyMessage">Auto-Reply Message</label>
+              <textarea
+                id="autoReplyMessage"
+                value={settings.advanced.autoReplyMessage}
+                onChange={(e) => {
+                  const newAdvanced = { ...settings.advanced, autoReplyMessage: e.target.value }
+                  updateSetting('advanced', newAdvanced)
+                }}
+                rows={3}
+              />
+            </div>
+
+            <div className="setting-item">
+              <label htmlFor="autoReplyKeywords">Auto-Reply Keywords</label>
+              <input
+                type="text"
+                id="autoReplyKeywords"
+                value={settings.advanced.autoReplyKeywords.join(', ')}
+                onChange={(e) => {
+                  const keywords = e.target.value.split(',').map(k => k.trim()).filter(k => k)
+                  const newAdvanced = { ...settings.advanced, autoReplyKeywords: keywords }
+                  updateSetting('advanced', newAdvanced)
+                }}
+                placeholder="busy, meeting, driving"
+              />
+              <span className="setting-description">
+                Comma-separated keywords that trigger auto-reply
               </span>
             </div>
           </>

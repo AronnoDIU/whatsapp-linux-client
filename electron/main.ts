@@ -417,6 +417,37 @@ app.whenReady().then(() => {
     console.warn('Could not register global shortcut', e)
   }
 
+  // Register additional productivity shortcuts
+  try {
+    // Ctrl+Alt+S: Toggle search
+    globalShortcut.register('Control+Alt+S', () => {
+      const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
+      if (win) {
+        win.webContents.send('toggle-search')
+      }
+    })
+
+    // Ctrl+Alt+T: Show quick reply templates
+    globalShortcut.register('Control+Alt+T', () => {
+      const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
+      if (win) {
+        win.webContents.send('show-quick-templates')
+      }
+    })
+
+    // Ctrl+Alt+B: Toggle busy mode (auto-reply)
+    globalShortcut.register('Control+Alt+B', () => {
+      const advanced = settings.get('advanced')
+      settings.set('advanced', { ...advanced, autoReplyEnabled: !advanced.autoReplyEnabled })
+      const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
+      if (win) {
+        win.webContents.send('auto-reply-toggled', advanced.autoReplyEnabled)
+      }
+    })
+  } catch (e) {
+    console.warn('Could not register additional shortcuts', e)
+  }
+
   // Listen for system theme changes
   nativeTheme.on('updated', () => {
     if (settings.get('darkMode') === 'auto') {
@@ -553,6 +584,62 @@ ipcMain.handle('settings:reset', () => {
     applyThemeToWindow(win)
   })
   return true
+})
+
+// Advanced features IPC handlers
+ipcMain.handle('search-messages', async (_event, query: string) => {
+  const advancedSettings = settings.get('advanced')
+  if (!advancedSettings.messageSearchEnabled) {
+    return []
+  }
+  
+  // Send search request to all windows
+  const results: any[] = []
+  BrowserWindow.getAllWindows().forEach(win => {
+    try {
+      win.webContents.send('search-messages', query)
+    } catch (err) {
+      console.warn('Failed to send search request:', err)
+    }
+  })
+  
+  return results
+})
+
+ipcMain.handle('get-quick-reply-templates', () => {
+  return settings.get('advanced').quickReplyTemplates
+})
+
+ipcMain.handle('add-quick-reply-template', (_event, template: string) => {
+  const advanced = settings.get('advanced')
+  const updated = [...advanced.quickReplyTemplates, template]
+  settings.set('advanced', { ...advanced, quickReplyTemplates: updated })
+  return true
+})
+
+ipcMain.handle('remove-quick-reply-template', (_event, index: number) => {
+  const advanced = settings.get('advanced')
+  const updated = advanced.quickReplyTemplates.filter((_, i) => i !== index)
+  settings.set('advanced', { ...advanced, quickReplyTemplates: updated })
+  return true
+})
+
+ipcMain.handle('send-auto-reply', (_event, message: string) => {
+  const advanced = settings.get('advanced')
+  if (!advanced.autoReplyEnabled) {
+    return false
+  }
+  
+  // Check if message contains any auto-reply keywords
+  const hasKeyword = advanced.autoReplyKeywords.some(keyword => 
+    message.toLowerCase().includes(keyword.toLowerCase())
+  )
+  
+  if (hasKeyword) {
+    return advanced.autoReplyMessage
+  }
+  
+  return null
 })
 
 app.on('window-all-closed', () => {

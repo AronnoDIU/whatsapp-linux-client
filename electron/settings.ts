@@ -23,6 +23,13 @@ export interface AppSettings {
     dndStartHour: number
     dndEndHour: number
   }
+  advanced: {
+    messageSearchEnabled: boolean
+    quickReplyTemplates: string[]
+    autoReplyEnabled: boolean
+    autoReplyMessage: string
+    autoReplyKeywords: string[]
+  }
 }
 
 const defaultSettings: AppSettings = {
@@ -47,6 +54,18 @@ const defaultSettings: AppSettings = {
     dndEnabled: false,
     dndStartHour: 22,
     dndEndHour: 8
+  },
+  advanced: {
+    messageSearchEnabled: true,
+    quickReplyTemplates: [
+      'I\'ll get back to you soon',
+      'Thanks for the message',
+      'Can we talk later?',
+      'On it!'
+    ],
+    autoReplyEnabled: false,
+    autoReplyMessage: 'I\'m currently busy. I\'ll get back to you as soon as possible.',
+    autoReplyKeywords: ['busy', 'meeting', 'driving']
   }
 }
 
