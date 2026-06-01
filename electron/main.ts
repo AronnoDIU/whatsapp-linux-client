@@ -329,8 +329,9 @@ function createSettingsWindow(initialView: 'home' | 'settings' | 'about' = 'home
       contextIsolation: true,
       nodeIntegration: false,
       backgroundThrottling: false,
-      // Use settings-preload for settings window
-      preload: app.isPackaged ? path.join(__dirname, '../settings-preload.mjs') : undefined
+      // Use regular preload for settings window in production
+      // Don't use preload in development to avoid module loading issues
+      preload: app.isPackaged ? path.join(__dirname, '../preload/preload.mjs') : undefined
     }
   })
 
