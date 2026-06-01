@@ -4,22 +4,42 @@ base: core24
 version: "0.1.0"
 summary: WhatsApp Web desktop client for Linux
 description: |
-  # Desktop Wrapper for WhatsApp Web
-  
   **An elegant, open-source desktop client that elevates your WhatsApp Web experience on Linux with seamless system integration and power-user features.**
   
   ### 🌟 Key Features
   
   * **System Tray Support**
-  Run quietly in the background with custom indicators.
+  Run quietly in the background with custom indicators and quick actions.
   * **Native Notifications**
-  Receive instant desktop alerts that match your system theme.
+  Receive instant desktop alerts with quick reply actions and message preview.
   * **Multi-Account Windows**
   Manage multiple phone numbers simultaneously in separate windows.
   * **Linux Screen Sharing**
-  Enjoy reliable, hassle-free sharing fully compatible with Linux.
+  Enjoy reliable, hassle-free sharing fully compatible with Linux via PipeWire.
   * **Lightweight Performance**
   Optimized resource usage compared to standard browser tabs.
+  
+  ### 🎨 UI/UX Improvements
+  
+  * **Dark Mode Toggle** - Automatic system theme detection with manual override (Auto/Light/Dark)
+  * **Compact Mode** - Smaller UI elements optimized for laptop users
+  * **Spell Checker** - Multi-language support including English, Spanish, French, German, Italian, Portuguese, and Russian
+  * **Beautiful Settings UI** - Easy-to-use settings panel with real-time updates
+  
+  ### 🔔 Enhanced Notifications
+  
+  * **Notification Actions** - Quick reply and mark as read buttons in notifications
+  * **Message Preview** - Show message content in notifications (toggleable)
+  * **Do Not Disturb Mode** - Mute notifications during specific hours
+  * **Smart DND** - Automatically suppress notifications during configured quiet hours
+  
+  ### ⚡ Advanced Features
+  
+  * **Message Search** - Search across all conversations (Ctrl+Alt+S)
+  * **Quick Reply Templates** - Save and reuse common responses (Ctrl+Alt+T)
+  * **Auto-Reply Mode** - Basic auto-reply for busy mode with keyword triggers (Ctrl+Alt+B)
+  * **Productivity Shortcuts** - Additional keyboard shortcuts for power users
+  * **Bengali Typography** - Optimized Bangla font rendering with Noto Bengali fonts
 
 grade: stable
 confinement: strict
