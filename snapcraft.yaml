@@ -84,25 +84,25 @@ parts:
     stage:
       - "*"
     override-build: |
-      snapcraftctl stage
+      craftctl default
       # Remove unnecessary files to reduce size
-      find $SNAPCRAFT_PART_INSTALL -name "*.map" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "*.ts" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "*.d.ts" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "*.log" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "*.md" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "LICENSE*" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "CHANGELOG*" -delete
-      find $SNAPCRAFT_PART_INSTALL -name "README*" -delete
-      find $SNAPCRAFT_PART_INSTALL -name ".git*" -delete
-      find $SNAPCRAFT_PART_INSTALL -name ".DS_Store" -delete
+      find $CRAFT_PART_INSTALL -name "*.map" -delete
+      find $CRAFT_PART_INSTALL -name "*.ts" -delete
+      find $CRAFT_PART_INSTALL -name "*.d.ts" -delete
+      find $CRAFT_PART_INSTALL -name "*.log" -delete
+      find $CRAFT_PART_INSTALL -name "*.md" -delete
+      find $CRAFT_PART_INSTALL -name "LICENSE*" -delete
+      find $CRAFT_PART_INSTALL -name "CHANGELOG*" -delete
+      find $CRAFT_PART_INSTALL -name "README*" -delete
+      find $CRAFT_PART_INSTALL -name ".git*" -delete
+      find $CRAFT_PART_INSTALL -name ".DS_Store" -delete
       # Remove unnecessary Electron resources
-      rm -rf $SNAPCRAFT_PART_INSTALL/resources/*.pak 2>/dev/null || true
-      rm -rf $SNAPCRAFT_PART_INSTALL/resources/*.bin 2>/dev/null || true
+      rm -rf $CRAFT_PART_INSTALL/resources/*.pak 2>/dev/null || true
+      rm -rf $CRAFT_PART_INSTALL/resources/*.bin 2>/dev/null || true
       # Remove locale files (keep only English)
-      find $SNAPCRAFT_PART_INSTALL/locales -type f ! -name "en-*.pak" -delete 2>/dev/null || true
+      find $CRAFT_PART_INSTALL/locales -type f ! -name "en-*.pak" -delete 2>/dev/null || true
       # Remove GPU shader cache
-      rm -rf $SNAPCRAFT_PART_INSTALL/resources/*.dat 2>/dev/null || true
+      rm -rf $CRAFT_PART_INSTALL/resources/*.dat 2>/dev/null || true
     stage-packages:
       # Minimal dependencies for Electron
       - libnss3
