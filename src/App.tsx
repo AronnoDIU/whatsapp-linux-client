@@ -1,6 +1,25 @@
+import { useState } from 'react'
 import './App.css'
+import Settings from './Settings'
+import './Settings.css'
 
 function App() {
+  const [showSettings, setShowSettings] = useState(false)
+
+  if (showSettings) {
+    return (
+      <main className="app-shell" aria-label="WhatsApp Linux Client Settings">
+        <Settings />
+        <button 
+          onClick={() => setShowSettings(false)}
+          className="back-btn"
+        >
+          ← Back to Home
+        </button>
+      </main>
+    )
+  }
+
   return (
     <main className="app-shell" aria-label="WhatsApp Linux Client">
       <section className="hero-card">
@@ -24,6 +43,15 @@ function App() {
             <span>Exit fullscreen</span>
             <strong>Esc</strong>
           </div>
+        </div>
+
+        <div className="action-buttons">
+          <button 
+            onClick={() => setShowSettings(true)}
+            className="settings-btn"
+          >
+            ⚙️ Open Settings
+          </button>
         </div>
       </section>
     </main>

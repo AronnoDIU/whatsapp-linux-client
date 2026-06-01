@@ -22,6 +22,7 @@ The app loads WhatsApp Web with a Chrome-like user agent and adds a set of compa
 - **Tray icon** with quick actions:
   - show / hide the main window
   - open a new window for a separate account
+  - toggle dark mode and compact mode
   - quit the application
 - **Global shortcut**: `Ctrl + Alt + W` toggles the window visibility
 - **Zoom shortcuts**: `Ctrl + =`, `Ctrl + -`, and `Ctrl + 0`
@@ -33,6 +34,14 @@ The app loads WhatsApp Web with a Chrome-like user agent and adds a set of compa
 - **Display-capture fallback** for screen sharing on Linux / PipeWire environments
 - **Permission handling** for camera, microphone, notifications, and display capture
 - **Bengali typography tuning** with bundled Noto Bengali fonts for cleaner Bangla rendering
+
+### 🎨 UI/UX Improvements
+
+- **Dark Mode Toggle** - Automatic system theme detection with manual override options (Auto/Light/Dark)
+- **Compact Mode** - Smaller UI elements optimized for laptop users
+- **Spell Checker** - Multi-language support including English (en-US), English (UK), Spanish, French, German, Italian, Portuguese, and Russian
+- **Settings UI** - Beautiful settings panel accessible from the app or system tray
+- **Real-time Updates** - Changes apply instantly without restart
 
 ## Prerequisites
 

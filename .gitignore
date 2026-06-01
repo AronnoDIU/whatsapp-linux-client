@@ -30,6 +30,7 @@ prime/
 stage/
 parts/
 *.snap
+build/
 
 # Build cache / temp
 .cache

@@ -30,6 +30,10 @@ contextBridge.exposeInMainWorld('whatsappNative', {
   createNewAccountWindow: () => ipcRenderer.send('create-new-account'),
   pickFiles: (options?: Electron.OpenDialogOptions) => ipcRenderer.invoke('dialog:openFiles', options),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  // Settings API
+  getSettings: () => ipcRenderer.invoke('settings:get'),
+  setSetting: (key: string, value: unknown) => ipcRenderer.invoke('settings:set', key, value),
+  resetSettings: () => ipcRenderer.invoke('settings:reset'),
   // Provide a desktop-capture fallback for getDisplayMedia (used for screen sharing)
   getDisplayMedia: async (constraints?: MediaStreamConstraints) => {
     // Try to pick a screen source, fall back to the first available source

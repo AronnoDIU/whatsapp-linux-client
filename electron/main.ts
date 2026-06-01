@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { app, BrowserWindow, Tray, Menu, nativeImage, globalShortcut, dialog, shell, ipcMain, Notification, desktopCapturer } from 'electron'
+import { app, BrowserWindow, Tray, Menu, nativeImage, globalShortcut, dialog, shell, ipcMain, Notification, desktopCapturer, nativeTheme } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
+import settings, { AppSettings } from './settings'
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
 // Enforce single instance: if a second instance is started, focus the existing window
@@ -113,6 +114,45 @@ function buildBengaliTypographyCSS() {
   `
 }
 
+function buildThemeCSS() {
+  const darkMode = settings.get('darkMode')
+  const compactMode = settings.get('compactMode')
+  
+  // Determine if dark mode should be active
+  let isDark = darkMode === 'dark'
+  if (darkMode === 'auto') {
+    isDark = nativeTheme.shouldUseDarkColors
+  }
+
+  return `
+    /* Compact mode styles */
+    ${compactMode ? `
+      .two, .three, .four {
+        padding: 4px !important;
+        margin: 2px !important;
+      }
+      
+      [data-testid="conversation-panel-header"] {
+        padding: 8px !important;
+      }
+      
+      [data-testid="message-out"] {
+        margin: 2px 0 !important;
+      }
+    ` : ''}
+  `
+}
+
+function applyThemeToWindow(win: BrowserWindow) {
+  try {
+    win.webContents.insertCSS(buildThemeCSS()).catch((err) => {
+      console.warn('Failed to inject theme CSS', err)
+    })
+  } catch (err) {
+    console.warn('Failed to apply theme', err)
+  }
+}
+
 let tray: Tray | null = null
 let mainWindow: BrowserWindow | null = null
 
@@ -128,8 +168,8 @@ function createMainWindow(partition = 'persist:default') {
       nodeIntegration: false,
       backgroundThrottling: false,
       spellcheck: true,
-        // electron-vite builds the preload bundle to dist-electron/preload/preload.mjs
-        preload: path.join(__dirname, '../preload/preload.mjs'),
+      // electron-vite builds the preload bundle to dist-electron/preload/preload.mjs
+      preload: path.join(__dirname, '../preload/preload.mjs'),
       partition
     }
   })
@@ -141,6 +181,30 @@ function createMainWindow(partition = 'persist:default') {
   // Load WhatsApp Web with a Chrome-like user agent for better compatibility (calls / media)
   win.webContents.setUserAgent(chromeLikeUA)
   win.webContents.session.setUserAgent(chromeLikeUA)
+  
+  // Configure spell check
+  const spellCheckSettings = settings.get('spellCheck')
+  if (spellCheckSettings.enabled) {
+    // Filter out unsupported languages before setting
+    const supportedLanguages = spellCheckSettings.languages.filter(lang => {
+      try {
+        win.webContents.session.setSpellCheckerLanguages([lang])
+        return true
+      } catch {
+        return false
+      }
+    })
+    
+    // Update settings if languages were filtered
+    if (supportedLanguages.length !== spellCheckSettings.languages.length) {
+      settings.set('spellCheck', { ...spellCheckSettings, languages: supportedLanguages })
+    }
+    
+    if (supportedLanguages.length > 0) {
+      win.webContents.session.setSpellCheckerLanguages(supportedLanguages)
+    }
+  }
+  
   win.loadURL('https://web.whatsapp.com', { userAgent: chromeLikeUA }).catch((err) => {
     console.error('Failed to load WhatsApp Web:', err)
   })
@@ -148,8 +212,9 @@ function createMainWindow(partition = 'persist:default') {
   win.webContents.on('did-finish-load', async () => {
     try {
       await win.webContents.insertCSS(buildBengaliTypographyCSS())
+      await applyThemeToWindow(win)
     } catch (err) {
-      console.warn('Failed to inject Bengali typography CSS', err)
+      console.warn('Failed to inject CSS', err)
     }
   })
 
@@ -310,6 +375,18 @@ function createTray(win: BrowserWindow) {
     { label: 'Zoom Out', accelerator: 'Ctrl+-', click: () => adjustZoom(win, -ZOOM_STEP) },
     { label: 'Reset Zoom', accelerator: 'Ctrl+0', click: () => win.webContents.setZoomFactor(1) },
     { type: 'separator' },
+    { label: 'Toggle Dark Mode', click: () => {
+      const current = settings.get('darkMode')
+      const next = current === 'dark' ? 'light' : current === 'light' ? 'auto' : 'dark'
+      settings.set('darkMode', next)
+      BrowserWindow.getAllWindows().forEach(w => applyThemeToWindow(w))
+    }},
+    { label: 'Toggle Compact Mode', click: () => {
+      const current = settings.get('compactMode')
+      settings.set('compactMode', !current)
+      BrowserWindow.getAllWindows().forEach(w => applyThemeToWindow(w))
+    }},
+    { type: 'separator' },
     { label: 'New Window (Separate Account)', click: () => createMainWindow(`persist:account-${Date.now()}`) },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() }
@@ -347,6 +424,15 @@ app.whenReady().then(() => {
     console.warn('Could not register global shortcut', e)
   }
 
+  // Listen for system theme changes
+  nativeTheme.on('updated', () => {
+    if (settings.get('darkMode') === 'auto') {
+      BrowserWindow.getAllWindows().forEach(win => {
+        applyThemeToWindow(win)
+      })
+    }
+  })
+
   // When renderer asks for files or native dialogs, forward via IPC (preload will call main)
 })
 
@@ -383,6 +469,29 @@ ipcMain.handle('get-app-version', () => ({
   version: app.getVersion(),
   platform: process.platform
 }))
+
+// Settings IPC handlers
+ipcMain.handle('settings:get', () => settings.getAll())
+
+ipcMain.handle('settings:set', (_event, key: string, value: unknown) => {
+  if (key in settings.getAll()) {
+    settings.set(key as keyof AppSettings, value as never)
+    // Apply theme changes to all windows
+    BrowserWindow.getAllWindows().forEach(win => {
+      applyThemeToWindow(win)
+    })
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('settings:reset', () => {
+  settings.reset()
+  BrowserWindow.getAllWindows().forEach(win => {
+    applyThemeToWindow(win)
+  })
+  return true
+})
 
 app.on('window-all-closed', () => {
   // On Linux we usually quit when windows are closed
