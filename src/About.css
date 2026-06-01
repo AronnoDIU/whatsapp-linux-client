@@ -1,8 +1,10 @@
 .about-container {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   padding: 2rem;
+  overflow-y: auto;
 }
 
 .about-card {
