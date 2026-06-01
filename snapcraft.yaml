@@ -127,4 +127,3 @@ parts:
       - libgbm1
       - libdrm2
       - libgl1
-      - libgl1-mesa-glx
