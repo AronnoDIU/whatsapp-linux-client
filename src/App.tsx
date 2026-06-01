@@ -1,10 +1,21 @@
-import '../electron/electron-env.d.ts'
 import { useState, useEffect } from 'react'
 import './App.css'
 import Settings from './Settings'
 import About from './About'
 import './Settings.css'
 import './About.css'
+
+// Declare the ipcRenderer property on the Window interface
+// This is necessary because Electron injects ipcRenderer onto the window object
+// and TypeScript doesn't know about it by default.
+declare global {
+  interface Window {
+    ipcRenderer?: {
+      on: (channel: string, listener: (...args: unknown[]) => void) => void;
+      off: (channel: string, listener: (...args: unknown[]) => void) => void;
+    };
+  }
+}
 
 type View = 'home' | 'settings' | 'about'
 
