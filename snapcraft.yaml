@@ -51,11 +51,6 @@ source-code: https://github.com/AronnoDIU/whatsapp-linux-client
 issues: https://github.com/AronnoDIU/whatsapp-linux-client/issues
 contact: https://www.linkedin.com/in/yeasirarafataronno/
 
-platforms:
-  amd64:
-    build-on: amd64
-    build-for: amd64
-
 apps:
   whats-tux:
     # command must match the actual executable produced by electron-builder
