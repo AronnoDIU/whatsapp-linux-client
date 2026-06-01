@@ -148,6 +148,7 @@ function applyThemeToWindow(win: BrowserWindow) {
 
 let tray: Tray | null = null
 let mainWindow: BrowserWindow | null = null
+let settingsWindow: BrowserWindow | null = null
 
 function createMainWindow(partition = 'persist:default') {
   const state = loadWindowState()
@@ -311,6 +312,52 @@ function createMainWindow(partition = 'persist:default') {
   return win
 }
 
+function createSettingsWindow(initialView: 'home' | 'settings' | 'about' = 'home') {
+  if (settingsWindow && !settingsWindow.isDestroyed()) {
+    settingsWindow.focus()
+    return settingsWindow
+  }
+
+  const win = new BrowserWindow({
+    width: 900,
+    height: 700,
+    show: false,
+    backgroundColor: '#0f172a',
+    autoHideMenuBar: true,
+    resizable: true,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      backgroundThrottling: false,
+      // Use settings-preload for settings window
+      preload: app.isPackaged ? path.join(__dirname, '../settings-preload.mjs') : undefined
+    }
+  })
+
+  // Load the React renderer for settings with view parameter
+  // In development, load from Vite dev server
+  // In production, load from built file
+  if (!app.isPackaged) {
+    win.loadURL(`http://localhost:5173/?view=${initialView}`)
+  } else {
+    win.loadFile(path.join(__dirname, '../../dist/src/renderer/index.html'), { search: `view=${initialView}` })
+  }
+
+  win.once('ready-to-show', () => {
+    if (!win.isDestroyed()) {
+      win.show()
+      win.focus()
+    }
+  })
+
+  win.on('closed', () => {
+    settingsWindow = null
+  })
+
+  settingsWindow = win
+  return win
+}
+
 async function desktopCaptureForDisplayShare() {
   const sources = await desktopCapturer.getSources({ types: ['screen', 'window'], thumbnailSize: { width: 1, height: 1 } })
 
@@ -381,6 +428,9 @@ function createTray(win: BrowserWindow) {
     }},
     { type: 'separator' },
     { label: 'New Window (Separate Account)', click: () => createMainWindow(`persist:account-${Date.now()}`) },
+    { type: 'separator' },
+    { label: 'Settings', click: () => createSettingsWindow('settings') },
+    { label: 'About', click: () => createSettingsWindow('about') },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() }
   ])
@@ -594,7 +644,6 @@ ipcMain.handle('search-messages', async (_event, query: string) => {
   }
   
   // Send search request to all windows
-  const results: any[] = []
   BrowserWindow.getAllWindows().forEach(win => {
     try {
       win.webContents.send('search-messages', query)
@@ -603,7 +652,7 @@ ipcMain.handle('search-messages', async (_event, query: string) => {
     }
   })
   
-  return results
+  return []
 })
 
 ipcMain.handle('get-quick-reply-templates', () => {

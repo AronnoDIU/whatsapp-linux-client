@@ -1,17 +1,62 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import Settings from './Settings'
+import About from './About'
 import './Settings.css'
+import './About.css'
+
+type View = 'home' | 'settings' | 'about'
 
 function App() {
-  const [showSettings, setShowSettings] = useState(false)
+  // Get initial view from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search)
+  const initialView = (urlParams.get('view') as View) || 'home'
+  const [currentView, setCurrentView] = useState<View>(initialView)
 
-  if (showSettings) {
+  useEffect(() => {
+    // Listen for show-settings event from main process
+    const handleShowSettings = () => {
+      setCurrentView('settings')
+    }
+
+    // Listen for show-about event from main process
+    const handleShowAbout = () => {
+      setCurrentView('about')
+    }
+
+    if (window.ipcRenderer) {
+      window.ipcRenderer.on('show-settings', handleShowSettings)
+      window.ipcRenderer.on('show-about', handleShowAbout)
+    }
+
+    return () => {
+      if (window.ipcRenderer) {
+        window.ipcRenderer.off('show-settings', handleShowSettings)
+        window.ipcRenderer.off('show-about', handleShowAbout)
+      }
+    }
+  }, [])
+
+  if (currentView === 'settings') {
     return (
       <main className="app-shell" aria-label="WhatsApp Linux Client Settings">
         <Settings />
         <button 
-          onClick={() => setShowSettings(false)}
+          onClick={() => setCurrentView('home')}
+          className="back-btn"
+        >
+          ← Back to Home
+        </button>
+      </main>
+    )
+  }
+
+  if (currentView === 'about') {
+    return (
+      <main className="app-shell" aria-label="WhatsApp Linux Client About">
+        <About />
+        <button 
+          onClick={() => setCurrentView('home')}
           className="back-btn"
         >
           ← Back to Home
@@ -47,10 +92,16 @@ function App() {
 
         <div className="action-buttons">
           <button 
-            onClick={() => setShowSettings(true)}
+            onClick={() => setCurrentView('settings')}
             className="settings-btn"
           >
             ⚙️ Open Settings
+          </button>
+          <button 
+            onClick={() => setCurrentView('about')}
+            className="about-btn"
+          >
+            ℹ️ About
           </button>
         </div>
       </section>

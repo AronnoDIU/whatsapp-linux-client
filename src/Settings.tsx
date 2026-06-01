@@ -32,16 +32,6 @@ interface AppSettings {
   }
 }
 
-declare global {
-  interface Window {
-    whatsappNative: {
-      getSettings: () => Promise<AppSettings>
-      setSetting: (key: string, value: unknown) => Promise<boolean>
-      resetSettings: () => Promise<boolean>
-    }
-  }
-}
-
 function Settings() {
   const [settings, setSettings] = useState<AppSettings | null>(null)
   const [loading, setLoading] = useState(true)
@@ -52,8 +42,49 @@ function Settings() {
 
   const loadSettings = async () => {
     try {
-      const currentSettings = await window.whatsappNative.getSettings()
-      setSettings(currentSettings)
+      if (window.whatsappNative && window.whatsappNative.getSettings) {
+        const currentSettings = await window.whatsappNative.getSettings()
+        setSettings(currentSettings)
+      } else {
+        console.warn('whatsappNative not available, using default settings')
+        // Use default settings if API not available
+        setSettings({
+          darkMode: 'auto',
+          customTheme: {
+            primaryColor: '#22c55e',
+            accentColor: '#16a34a',
+            backgroundColor: '#0f172a',
+            textColor: '#f8fafc'
+          },
+          compactMode: false,
+          spellCheck: {
+            enabled: true,
+            languages: ['en-US']
+          },
+          zoomLevel: 1.0,
+          notifications: {
+            enabled: true,
+            showPreview: true,
+            enableActions: true,
+            customSound: '',
+            dndEnabled: false,
+            dndStartHour: 22,
+            dndEndHour: 8
+          },
+          advanced: {
+            messageSearchEnabled: true,
+            quickReplyTemplates: [
+              'I\'ll get back to you soon',
+              'Thanks for the message',
+              'Can we talk later?',
+              'On it!'
+            ],
+            autoReplyEnabled: false,
+            autoReplyMessage: 'I\'m currently busy. I\'ll get back to you as soon as possible.',
+            autoReplyKeywords: ['busy', 'meeting', 'driving']
+          }
+        })
+      }
     } catch (err) {
       console.error('Failed to load settings:', err)
     } finally {
@@ -63,8 +94,12 @@ function Settings() {
 
   const updateSetting = async (key: string, value: unknown) => {
     try {
-      await window.whatsappNative.setSetting(key, value)
-      await loadSettings()
+      if (window.whatsappNative && window.whatsappNative.setSetting) {
+        await window.whatsappNative.setSetting(key, value)
+        await loadSettings()
+      } else {
+        console.warn('whatsappNative not available, setting not saved')
+      }
     } catch (err) {
       console.error('Failed to update setting:', err)
     }
@@ -73,8 +108,12 @@ function Settings() {
   const resetAllSettings = async () => {
     if (confirm('Are you sure you want to reset all settings to defaults?')) {
       try {
-        await window.whatsappNative.resetSettings()
-        await loadSettings()
+        if (window.whatsappNative && window.whatsappNative.resetSettings) {
+          await window.whatsappNative.resetSettings()
+          await loadSettings()
+        } else {
+          console.warn('whatsappNative not available, settings not reset')
+        }
       } catch (err) {
         console.error('Failed to reset settings:', err)
       }
