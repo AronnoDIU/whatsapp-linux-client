@@ -5,15 +5,6 @@ interface AppVersion {
   platform: string
 }
 
-declare global {
-  interface Window {
-    whatsappNative: {
-      getAppVersion: () => Promise<AppVersion>
-      openExternal: (url: string) => Promise<boolean>
-    }
-  }
-}
-
 function About() {
   const [version, setVersion] = useState<AppVersion | null>(null)
   const [loading, setLoading] = useState(true)
@@ -148,7 +139,7 @@ function About() {
 
         <div className="about-footer">
           <p className="copyright">
-            © 2024 Yeasir Arafat Aronno. All rights reserved.
+            © 2026 Yeasir Arafat Aronno. All rights reserved.
           </p>
           <p className="platform">
             Platform: {version?.platform || 'Linux'}

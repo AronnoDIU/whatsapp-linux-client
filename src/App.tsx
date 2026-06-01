@@ -1,3 +1,4 @@
+import '../electron/electron-env.d.ts'
 import { useState, useEffect } from 'react'
 import './App.css'
 import Settings from './Settings'

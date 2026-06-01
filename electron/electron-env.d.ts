@@ -1,5 +1,3 @@
-/// <reference types="vite-plugin-electron/electron-env" />
-
 declare namespace NodeJS {
   interface ProcessEnv {
     /**
@@ -21,16 +19,21 @@ declare namespace NodeJS {
   }
 }
 
-import type { AppSettings } from './settings'
-
 // Used in Renderer process, expose in `preload.ts`
-interface Window {
-  ipcRenderer: import('electron').IpcRenderer
-  whatsappNative: {
-    openExternal: (url: string) => Promise<boolean>
-    getAppVersion: () => Promise<{ version: string; platform: string }>
-    getSettings: () => Promise<AppSettings>
-    setSetting: (key: string, value: unknown) => Promise<boolean>
-    resetSettings: () => Promise<boolean>
+declare global {
+  interface Window {
+    ipcRenderer: {
+      on: (channel: string, listener: (event: Electron.IpcRendererEvent, ...args: unknown[]) => void) => Electron.IpcRenderer
+      off: (channel: string, ...args: unknown[]) => Electron.IpcRenderer
+      send: (channel: string, ...args: unknown[]) => void
+      invoke: (channel: string, ...args: unknown[]) => Promise<unknown>
+    }
+    whatsappNative: {
+      openExternal: (url: string) => Promise<boolean>
+      getAppVersion: () => Promise<{ version: string; platform: string }>
+      getSettings: () => Promise<import('./settings').AppSettings>
+      setSetting: (key: string, value: unknown) => Promise<boolean>
+      resetSettings: () => Promise<boolean>
+    }
   }
 }
