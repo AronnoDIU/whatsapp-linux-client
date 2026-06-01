@@ -31,6 +31,8 @@ stage/
 parts/
 *.snap
 build/
+# But keep icon source files
+!build/icon.svg
 
 # Build cache / temp
 .cache
