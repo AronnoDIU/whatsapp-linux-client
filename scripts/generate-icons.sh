@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-SOURCE_SVG="$ROOT_DIR/build/icon.svg"
+SOURCE_PNG="$ROOT_DIR/public/app-icon.png"
 ICON_DIR="$ROOT_DIR/build/icons"
 SNAP_GUI_DIR="$ROOT_DIR/snap/gui"
 
@@ -15,8 +15,8 @@ fi
 mkdir -p "$ICON_DIR" "$SNAP_GUI_DIR"
 
 # Generate high-resolution PNG assets for Snap/App Center listing and desktop integrations.
-convert "$SOURCE_SVG" -resize 512x512 "$ICON_DIR/icon-512.png"
-convert "$SOURCE_SVG" -resize 1024x1024 "$ICON_DIR/icon-1024.png"
+convert "$SOURCE_PNG" -resize 512x512 "$ICON_DIR/icon-512.png"
+convert "$SOURCE_PNG" -resize 1024x1024 "$ICON_DIR/icon-1024.png"
 
 cp "$ICON_DIR/icon-512.png" "$ROOT_DIR/build/icon.png"
 cp "$ICON_DIR/icon-512.png" "$ROOT_DIR/public/tray-icon.png"
