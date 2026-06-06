@@ -340,7 +340,7 @@ function createSettingsWindow(initialView: 'home' | 'settings' | 'about' = 'home
   if (!app.isPackaged) {
     win.loadURL(`http://localhost:5173/?view=${initialView}`)
   } else {
-    win.loadFile(path.join(__dirname, '../../dist/src/renderer/index.html'), { search: `view=${initialView}` })
+    win.loadFile(path.join(__dirname, '../../dist/index.html'), { search: `view=${initialView}` })
   }
 
   win.once('ready-to-show', () => {
