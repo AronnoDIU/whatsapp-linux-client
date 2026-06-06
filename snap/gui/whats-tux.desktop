@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=WhatsApp Linux Client
+Name=WhatsApp for Linux
 Comment=Unofficial desktop wrapper for WhatsApp Web on Linux
 Exec=whats-tux %U
 Terminal=false

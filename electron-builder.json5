@@ -3,7 +3,7 @@
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "io.github.aronno.whatsapplinuxclient",
   "asar": true,
-  "productName": "WhatsApp Linux Client",
+  "productName": "WhatsApp for Linux",
   "executableName": "whats-tux",
   "directories": {
     "output": "release/${version}"
@@ -41,7 +41,7 @@
     "icon": "build/icon.png",
     "desktop": {
       "entry": {
-        "Name": "WhatsApp Linux Client",
+        "Name": "WhatsApp for Linux",
         "Comment": "Unofficial desktop wrapper for WhatsApp Web on Linux",
         "Categories": "Network;Chat;InstantMessaging;",
         "Keywords": "WhatsApp;Chat;Messaging;Linux;",
